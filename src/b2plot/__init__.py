@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-from pkg_resources import get_distribution, DistributionNotFound
+import pkg_resources
 
-try:
-    # Change here if project is renamed and does not equal the package name
-    dist_name = __name__
-    __version__ = get_distribution(dist_name).version
-except DistributionNotFound:
-    __version__ = 'unknown'
+__version__ = pkg_resources.get_distribution(__name__).version
+
+from _style import set_default_style, set_small_style
+from plot_wrappers import hist, errorhist
+from _manager import xaxis, nf
+from functions import draw_y_label, decorate
+
