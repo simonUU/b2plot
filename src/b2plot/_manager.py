@@ -27,7 +27,7 @@ class TheManager:
             set_default_style()
             self.style_set = True
 
-    def new_figure(self):
+    def figure(self):
         f = plt.figure(tight_layout={'pad': 0})
         self.xaxis = None
         return f
@@ -41,4 +41,8 @@ def xaxis():
 
 
 def nf():
-    return manager.new_figure()
+    return manager.figure()
+
+
+def figure():
+    return manager.figure()
