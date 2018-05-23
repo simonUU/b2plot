@@ -4,8 +4,8 @@ In this file all the matplolib wrappers are located.
 
 """
 
-from _manager import manager
-from _helpers import get_optimal_bin_size
+from ._manager import manager
+from ._helpers import get_optimal_bin_size
 import pandas as pd
 import numpy as np
 
@@ -25,7 +25,21 @@ def _hist_init(data, xaxis, range=None):
     return xaxis
 
 
-def hist(data, xaxis=None, histtype='step', range=None,  lw=2, *args, **kwargs):
+def text(t, x=0.8, y=0.9, fontsize=22, *args, **kwargs):
+    """
+
+    :param t:
+    :param x:
+    :param y:
+    :param fontsize:
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    plt.text(x, y, t, transform=plt.gca().transAxes, fontsize=fontsize, *args, **kwargs)
+
+
+def hist(data, xaxis=None, fill=False, range=None,  lw=2, *args, **kwargs):
     """
 
     :param data:
@@ -43,12 +57,19 @@ def hist(data, xaxis=None, histtype='step', range=None,  lw=2, *args, **kwargs):
     if type(data) is pd.Series:
         data = data.values
 
+    histtype = 'step'
+    if fill:
+        histtype = 'stepfilled'
+
     y, xaxis, _ = plt.hist(data, xaxis, range=range, histtype=histtype, lw=lw, *args, **kwargs)
+
 
     manager.set_x_axis(xaxis)
 
 
-def errorhist(data, xaxis=None, color='black', normed=False, fmt=' ', range=None, *args, **kwargs):
+def errorhist(data, xaxis=None, color='black', normed=False, fmt=' ', range=None, 
+              xerr=False,
+              *args, **kwargs):
     """
 
     :param data:
@@ -73,8 +94,10 @@ def errorhist(data, xaxis=None, color='black', normed=False, fmt=' ', range=None
     if normed:
         yom, x = np.histogram(data, xaxis,)
         err = np.sqrt(np.array(yom)) *(y/yom)
-    xerr = (x[1]-x[0])/2.0
-
+    if xerr is not False:
+        xerr = (x[1]-x[0])/2.0
+    else:
+        xerr = None
     plt.errorbar(bin_centers, y, yerr=err, xerr=xerr, fmt=fmt, color=color, *args, **kwargs)
 
     manager.set_x_axis(xaxis)

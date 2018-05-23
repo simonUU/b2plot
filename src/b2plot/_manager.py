@@ -4,8 +4,11 @@ In this file the plot manager lives..
 
 """
 
-from _helpers import Singleton
-from _style import set_default_style
+from ._helpers import Singleton
+from ._style import set_default_style
+
+import matplotlib.pyplot as plt
+
 
 @Singleton
 class TheManager:
@@ -25,7 +28,9 @@ class TheManager:
             self.style_set = True
 
     def new_figure(self):
+        f = plt.figure(tight_layout={'pad': 0})
         self.xaxis = None
+        return f
 
 
 manager = TheManager.Instance()
@@ -36,4 +41,4 @@ def xaxis():
 
 
 def nf():
-    manager.new_figure()
+    return manager.new_figure()
