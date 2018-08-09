@@ -5,7 +5,6 @@ In this file the plot manager lives..
 """
 
 from ._helpers import Singleton
-from ._style import set_default_style
 
 import matplotlib.pyplot as plt
 
@@ -14,7 +13,6 @@ import matplotlib.pyplot as plt
 class TheManager:
     def __init__(self):
         self.xaxis = None
-        self.style_set = False
 
     def get_x_axis(self):
         return self.xaxis
@@ -22,13 +20,9 @@ class TheManager:
     def set_x_axis(self, axis):
         self.xaxis = axis
 
-    def set_style(self):
-        if self.style_set is False:
-            set_default_style()
-            self.style_set = True
-
     def figure(self):
-        f = plt.figure(tight_layout={'pad': 0})
+        # f = plt.figure(tight_layout={'pad': 0})
+        f = plt.figure()
         self.xaxis = None
         return f
 
