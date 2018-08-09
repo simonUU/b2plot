@@ -3,7 +3,7 @@
 
 """
 
-from ._manager import manager
+from .helpers import manager
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
