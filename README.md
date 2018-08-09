@@ -3,17 +3,28 @@ b2plot
 ======
 
 
-Add a short description here!
 
 
 Description
 ===========
 
-A longer description of your project goes here...
+Style and plotting tools for matplotlib.
+
+Installation
+============
+
+```bash
+
+python3 ./setup.py develep --user
+
+```
+
+The matolotlib style can be installed in the sytlelib folder:
+
+```bash
+
+./install_mlp_style.sh
+
+```
 
 
-Note
-====
-
-This project has been set up using PyScaffold 3.0.3. For details and usage
-information on PyScaffold see http://pyscaffold.org/.
