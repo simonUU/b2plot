@@ -1,50 +1,95 @@
+# -*- coding: utf-8 -*-
+"""
+
+"""
 
 from ._manager import manager
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 
-def draw_y_label(label='Entries', unit=None, fontsize=None, ha='right'):
+def draw_y_label(label='Entries', unit=None, ha='right', *args, **kwargs):
     """ Plotting scientific notation y label
     :param label:
     :param unit:
     :return:
     """
     x_axis = manager.get_x_axis()
-    width = 0.0
     if unit is None:
-        unit = ''
-    try:
-        width = x_axis[1] - x_axis[0]
-    except TypeError:
-        plt.ylabel(label+' / ' + unit, fontsize=fontsize, ha=ha)
+        plt.ylabel(label, ha=ha, *args, **kwargs)
     else:
-        plt.ylabel(label+' / %.3f'%width + ' ' + unit, fontsize=fontsize, ha=ha)
+        try:
+            width = x_axis[1] - x_axis[0]
+        except TypeError:
+            plt.ylabel(label+' / ' + unit, ha=ha, *args, **kwargs)
+        else:
+            plt.ylabel(label+' / %.3f' % width + ' ' + unit, ha=ha, *args, **kwargs)
+
+
+def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95):
+    font = FontProperties()
+    font.set_style('italic')
+    font.set_weight('bold')
+
+    plt.text(px, py, "Belle II", ha='right',
+             transform=plt.gca().transAxes,
+             fontsize=fontsize,
+             style='italic',
+             alpha=alpha,
+             fontproperties=font,
+             # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
+             )
+    plt.text(px + 0.02, py, t, ha='left',
+             transform=plt.gca().transAxes,
+             fontsize=fontsize,
+             #          style='italic',
+             alpha=alpha,
+             #          fontproperties=font,
+             # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
+             )
+
+
+def lumi(l="5", px=0.75, py=0.85,):
+    plt.text(px, py, "$\int$ L$=$" + l, transform=plt.gca().transAxes, )
+
+
+def expand(factor =1.2):
+    plt.ylim(0, plt.ylim()[1] * factor)
+
 
 def set_style():
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(-3, 4))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(-3, 4), useMathText=True)
     ax = plt.gca()
     ax.yaxis.set_ticks_position('both')
     ax.xaxis.set_ticks_position('both')
     plt.minorticks_on()
+    # plt.tight_layout()
+
+    plt.subplots_adjust(left=0.15, right=0.92, top=0.92, bottom=0.15)
 
 
-def decorate(xlabel, ylabel=None, title=None, unit=None, titlesize=None, fontsize=None, ha='right'):
-    
-    set_style()
-    
-    plt.xlabel(xlabel, horizontalalignment='right', x=1.0, fontsize=fontsize)
-    if ylabel is not None:
-        plt.ylabel(ylabel, horizontalalignment='right', y=1.0, fontsize=fontsize)
-    #ax.tick_params( length=7, width=.7, )
-    #ax.tick_params(which='minor', length=4, width=.5, )
-    
+def labels(xlabel=None, ylabel=None, unit=None, root_style=False, *args, **kwargs):
+
+    ha = 'center'
+    x,y = .5, .5
+
+    if root_style:
+        ha = 'right'
+        x,y = 1,1
+
+    if xlabel is not None:
+        plt.xlabel(xlabel, horizontalalignment=ha, x=x, *args, **kwargs)
+
     if unit is not None:
-        plt.xlabel(xlabel + ' [' + unit + ']', fontsize=fontsize, ha=ha)
+        if unit is not '':
+            plt.xlabel(xlabel + ' [' + unit + ']', ha=ha, x=x, *args, **kwargs)
         if ylabel is not None:
-            draw_y_label(ylabel, unit, fontsize=fontsize, ha=ha)
+            draw_y_label(ylabel, unit,  horizontalalignment=ha, y=y,  *args, **kwargs)
     else:
-        plt.xlabel(xlabel, fontsize=fontsize, ha=ha)
+        if xlabel is not None:
+            plt.xlabel(xlabel, horizontalalignment=ha, x=x, *args, **kwargs)
         if ylabel is not None:
-            draw_y_label(ylabel, fontsize=fontsize, ha=ha)
-    if title is not None:
-        plt.title(title, fontsize=titlesize)
+            draw_y_label(ylabel,  horizontalalignment=ha, y=y,  *args, **kwargs)
+
+def decorate( *args, **kwargs):
+    labels( *args, **kwargs)
