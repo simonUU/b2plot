@@ -2,9 +2,9 @@ import pkg_resources
 
 __version__ = pkg_resources.get_distribution(__name__).version
 
-from .plot_wrappers import hist, errorbar, stacked, to_stack, profile, xlim, sig_bkg_plot
-from ._manager import xaxis, nf, figure
-from .functions import draw_y_label, decorate, expand, watermark, lumi, labels
+from .functions import hist, errorbar, stacked, to_stack, profile, xlim, sig_bkg_plot
+from .helpers import xaxis, nf, figure
+from .decorations import draw_y_label, decorate, expand, watermark, lumi, labels
 from .colors import cm, b2helix
 
 import matplotlib as mpl
