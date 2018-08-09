@@ -51,5 +51,5 @@ b2plot.hist([1,2])
 
 ```
 
-  
+![Example](examples/example_stacked.pdf)
 
