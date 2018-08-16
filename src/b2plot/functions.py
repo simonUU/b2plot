@@ -42,8 +42,27 @@ STYLES_hatches = [None, '///', r"\\\ ",".+",'xxx','--', '++', 'xx', '//', '*', '
 
 
 
-def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None,
+def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
          *args, **kwargs):
+    """
+
+    Args:
+        data:
+        bins:
+        fill:
+        range:
+        lw:
+        ax:
+        style:
+        color:
+        scale:
+        weights:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
 
 
     if ax is None:
@@ -65,14 +84,24 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     else:
         style = 0
 
+    if weights is None:
+        weights = np.ones(len(data))
+
+    if scale is not None:
+        if isinstance(scale, int) or isinstance(scale, float):
+            if not isinstance(scale, bool):
+                weights *= scale
+        else:
+            print("Please provide int or float with scale")
+
     if fill:
         fc = color if style == 0 else 'none'
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color)
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled',hatch=STYLES_hatches[style],
-                              edgecolor=color, facecolor=fc, linewidth=0,
+        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
+        y, xaxis, _ = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
+                              edgecolor=color, facecolor=fc, linewidth=0, weights=weights,
                               alpha=0.4, color=color, *args, **kwargs)
     else:
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, *args, **kwargs)
+        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
 
     manager.set_x_axis(xaxis)
 
@@ -117,6 +146,12 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     if ax is None:
         ax = plt.gca()
+
+    if color is None:
+        from b2plot.colors import b2helix
+        n_stacks = len(data)
+        if n_stacks < 20:
+            color = b2helix(n_stacks)
 
     xaxis = _hist_init(data[0], bins, xrange=range)
 
@@ -178,11 +213,10 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
 
     if box:
         xerr = (x[:-1] - x[1:]) / 2.0
-        print(y)
         xerr = xerr[toplot]
-        hi =  err[0] + err[1]
+        hi = err[0] + err[1]
         lo = y[toplot] - err[0]
-        plt.errorbar(bin_centers[toplot], y[toplot], color=color, xerr=xerr, fmt=fmt)
+        plt.errorbar(bin_centers[toplot], y[toplot], color=color, xerr=xerr, fmt=' ')
         plt.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=.7,
                 width=2 * xerr,
                 edgecolor=color, *args, **kwargs)
