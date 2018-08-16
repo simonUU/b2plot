@@ -26,31 +26,31 @@ def draw_y_label(label='Entries', unit=None, ha='right', *args, **kwargs):
             plt.ylabel(label+' / %.3f' % width + ' ' + unit, ha=ha, *args, **kwargs)
 
 
-def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95):
-    font = FontProperties()
-    font.set_style('italic')
-    font.set_weight('bold')
+def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  *args, **kwargs):
+    # font = FontProperties()
+    # font.set_style('italic')
+    # font.set_weight('bold')
 
     plt.text(px, py, "Belle II", ha='right',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              style='italic',
-             alpha=alpha,
-             fontproperties=font,
+             alpha=alpha,  *args, **kwargs
+             # fontproperties=font,
              # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
              )
     plt.text(px + 0.02, py, t, ha='left',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              #          style='italic',
-             alpha=alpha,
+             alpha=alpha,  *args, **kwargs
              #          fontproperties=font,
              # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
              )
 
 
 def lumi(l="5", px=0.75, py=0.85,):
-    plt.text(px, py, "$\int$ L$=$" + l, transform=plt.gca().transAxes, )
+    plt.text(px, py, "$\int$ L $d$t $=$" + l, transform=plt.gca().transAxes, )
 
 
 def expand(factor =1.2):
