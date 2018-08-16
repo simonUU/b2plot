@@ -50,7 +50,7 @@ def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  
 
 
 def lumi(l="5", px=0.75, py=0.85,):
-    plt.text(px, py, "$\int$ L $d$t $=$" + l, transform=plt.gca().transAxes, )
+    plt.text(px, py, "$\smallint L $d$t $=$" + l, transform=plt.gca().transAxes, )
 
 
 def expand(factor =1.2):
