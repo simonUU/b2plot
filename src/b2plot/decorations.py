@@ -35,7 +35,8 @@ def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              style='italic',
-             alpha=alpha,  *args, **kwargs
+             alpha=alpha,  *args, **kwargs,
+             weight='bold',
              # fontproperties=font,
              # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
              )
@@ -49,8 +50,8 @@ def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  
              )
 
 
-def lumi(l="5", px=0.75, py=0.85,):
-    plt.text(px, py, "$\int L d$t $=$" + l, transform=plt.gca().transAxes, )
+def lumi(l="$5\; pb^{-1}$", px=0.75, py=0.85,):
+    plt.text(px, py, "$\int\,L\,dt\;=\;$" + l, transform=plt.gca().transAxes, )
 
 
 def expand(factor =1.2):
