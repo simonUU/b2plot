@@ -15,7 +15,7 @@ Installation
 
 ```bash
 
-python3 ./setup.py develep --user
+python3 ./setup.py develop --user
 
 ```
 

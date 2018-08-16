@@ -35,3 +35,18 @@ def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
         y /= orig
         ax.fill_between(bin_center, tmp, y, color=colormap(quantil/100.0))
         tmp = y
+
+
+
+def profile(x, y, bins=None, range=None, fmt='.', *args, **kwargs):
+    import scipy
+
+
+    xaxis = _hist_init(x, bins, xrange=range)
+
+
+    means = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic='mean').statistic
+    std = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic=scipy.stats.sem).statistic
+
+    bin_centers = (xaxis[:-1] + xaxis[1:]) / 2.
+    plt.errorbar(x=bin_centers, y=means, yerr=std, linestyle='none', fmt=fmt, *args, **kwargs)

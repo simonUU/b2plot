@@ -43,7 +43,7 @@ STYLES_hatches = [None, '///', r"\\\ ",".+",'xxx','--', '++', 'xx', '//', '*', '
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
-         *args, **kwargs):
+         label=None,  *args, **kwargs):
     """
 
     Args:
@@ -98,12 +98,14 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
         fc = color if style == 0 else 'none'
         y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, _ = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                              edgecolor=color, facecolor=fc, linewidth=0, weights=weights,
+                              edgecolor=color, facecolor=fc, linewidth=0, weights=weights, label=label,
                               alpha=0.4, color=color, *args, **kwargs)
     else:
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
+        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
+                              label=label, *args, **kwargs)
 
     manager.set_x_axis(xaxis)
+    return y, xaxis
 
 
 def to_stack(df, col, by):
@@ -159,6 +161,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
                           lw=lw, color=color, edgecolor=edgecolor, stacked=True, *args, **kwargs)
 
     manager.set_x_axis(xaxis)
+
 
 
 def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
@@ -226,18 +229,6 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
     manager.set_x_axis(xaxis)
 
 
-def profile(x, y, bins=None, range=None, fmt='.', *args, **kwargs):
-    import scipy
-
-
-    xaxis = _hist_init(x, bins, xrange=range)
-
-
-    means = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic='mean').statistic
-    std = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic=scipy.stats.sem).statistic
-
-    bin_centers = (xaxis[:-1] + xaxis[1:]) / 2.
-    plt.errorbar(x=bin_centers, y=means, yerr=std, linestyle='none', fmt=fmt, *args, **kwargs)
 
 
 def xlim(low=None, high=None, ax=None):
