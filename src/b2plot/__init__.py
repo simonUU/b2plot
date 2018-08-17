@@ -8,8 +8,8 @@ from .decorations import draw_y_label, decorate, expand, watermark, lumi, labels
 from .colors import cm, b2helix
 
 import matplotlib as mpl
-mpl.rcParams['mathtext.fontset'] = 'cm'
-mpl.rcParams['mathtext.rm'] = 'serif'
+# mpl.rcParams['mathtext.fontset'] = 'cm'
+# mpl.rcParams['mathtext.rm'] = 'serif'
 # mpl.rcParams['axes.autolimit_mode'] = 'round_numbers'
 
 print("For optimal usage set `plt.style.use('belle2')`")

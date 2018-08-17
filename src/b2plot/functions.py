@@ -8,7 +8,7 @@ from .helpers import get_optimal_bin_size, manager
 from .colors import b2cm
 import pandas as pd
 import numpy as np
-
+from matplotlib.colors import hex2color
 
 import matplotlib.pyplot as plt
 
@@ -79,6 +79,10 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     if color is None:
         color = next(ax._get_lines.prop_cycler)["color"]
 
+    # convert color
+    if not isinstance(color, list) or isinstance(color, tuple):
+        color = hex2color(color)
+
     if style is not None:
         fill = True
     else:
@@ -95,11 +99,11 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
             print("Please provide int or float with scale")
 
     if fill:
-        fc = color if style == 0 else 'none'
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
+        fc = (*color, 0.5) if style == 0 else 'none'
+        # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, _ = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                              edgecolor=color, facecolor=fc, linewidth=0, weights=weights, label=label,
-                              alpha=0.4, color=color, *args, **kwargs)
+                              edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                              color=color, *args, **kwargs)
     else:
         y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
                               label=label, *args, **kwargs)
