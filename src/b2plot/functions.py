@@ -37,9 +37,8 @@ def text(t, x=0.8, y=0.9, fontsize=22, *args, **kwargs):
     plt.text(x, y, t, transform=plt.gca().transAxes, fontsize=fontsize, *args, **kwargs)
 
 
-STYLES_facecolor = [None,'none','none','none','none','none']
-STYLES_hatches = [None, '///', r"\\\ ",".+",'xxx','--', '++', 'xx', '//', '*', 'o', 'O', '.']
-
+STYLES_facecolor = [None, 'none', 'none', 'none', 'none', 'none']
+STYLES_hatches = [None, '///', r"\\\ ", ".+", 'xxx', '--', '++', 'xx', '//', '*', 'o', 'O', '.']
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
@@ -100,16 +99,17 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
 
     if fill:
         fc = (*color, 0.5) if style == 0 else 'none'
-        # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights, *args, **kwargs)
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                              edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
-                              color=color, *args, **kwargs)
+        # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step',
+        #                       lw=lw, color=color, weights=weights, *args, **kwargs)
+        y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
+                                    edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                                    color=color, *args, **kwargs)
     else:
-        y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
-                              label=label, *args, **kwargs)
+        y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
+                                    label=label, *args, **kwargs)
 
     manager.set_x_axis(xaxis)
-    return y, xaxis
+    return y, xaxis, patches
 
 
 def to_stack(df, col, by):
@@ -168,7 +168,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
 
 
-def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
+def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, scale=None,
               xerr=False, box=False, ax=None, weights=None, plot_zero=False, *args, **kwargs):
     """
 
@@ -190,6 +190,16 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
     if type(data) is pd.Series:
         data = data.values
 
+    if weights is None:
+        weights = np.ones(len(data))
+
+    if scale is not None:
+        if isinstance(scale, int) or isinstance(scale, float):
+            if not isinstance(scale, bool):
+                weights *= scale
+        else:
+            print("Please provide int or float with scale")
+
     y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
 
     if isinstance(color, int):
@@ -202,8 +212,8 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None,
     # https://www-cdf.fnal.gov/physics/statistics
     err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
     if normed:
-        yom, x = np.histogram(data, xaxis,)
-        err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) *(y/yom))
+        yom, x = np.histogram(data, xaxis, weights=weights)
+        err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
     if xerr is not False:
         xerr = (x[1]-x[0])/2.0
     else:
@@ -253,6 +263,25 @@ def xlim(low=None, high=None, ax=None):
         ax.set_xlim(np.min(xaxis), np.max(xaxis))
     if low is not None or high is not None:
         ax.set_xlim(low, high)
+
+
+def save(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs):
+    """ Save a file and do the subplot_adjust to fit the page with larger labels
+
+    Args:
+        filename:
+        bottom:
+        left:
+        right:
+        top:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    plt.subplots_adjust(bottom=bottom, left=left, right=right, top=top)
+    plt.savefig(filename, *args, **kwargs)
 
 
 def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None):

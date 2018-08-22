@@ -8,6 +8,37 @@ Helper function and classes are defined here.
 import matplotlib.pyplot as plt
 
 
+def hist2root(h, name=None, title=''):
+    """
+
+    Args:
+        h: array with the histogram h=(y_values, bin_edges, (patches=optional))
+        name: Name for the root histogram, optional
+        title: Title for the root histogram, optional
+
+    Returns:
+        TH1F or TH2F depending on the input array
+
+    Examples:
+        >>> data = [1,2,3,4,5,6,7]
+        >>> h = b2plot.hist(data)
+        >>> from b2plot.helpers import hist2root
+        >>> root_hist = hist2root(h)
+
+    """
+    import root_numpy
+    import random
+    import ROOT
+
+    y_values = h[0]
+    name = "".join(random.choice("fck_root_wtf") for _ in range(5)) if name is None else name
+    if len(h) > 3:
+        rh = ROOT.TH2F(name, title, len(h[1]) - 1, h[1], len(h[2]) - 1, h[2])
+    else:
+        rh = ROOT.TH1F(name, title, len(h[1]) - 1, h[1])
+    return root_numpy.array2hist(y_values, rh)
+
+
 def get_optimal_bin_size(n):
     """
     This function calculates the optimal amount of bins for the number of events n.
