@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 def hist2root(h, name=None, title=''):
-    """
+    """ Convert your histograms to a root histogram.. if you really want to
 
     Args:
         h: array with the histogram h=(y_values, bin_edges, (patches=optional))

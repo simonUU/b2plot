@@ -9,8 +9,8 @@ echo -n "(y/n)? "
 read answer
 
 if [ "$answer" != "${answer#[Yy]}" ] ;then
-    echo mkdir -p  $INSTALL_FOLDER
-    echo cp ./belle2*.mplstyle $INSTALL_FOLDER
+    mkdir -p  $INSTALL_FOLDER
+    cp ./belle2*.mplstyle $INSTALL_FOLDER
 else
     echo You can also create a sym-link:
     echo ln -s ./belle2*.mplstyle $INSTALL_FOLDER
