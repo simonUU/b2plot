@@ -161,11 +161,12 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     xaxis = _hist_init(data[0], bins, xrange=range)
 
-    y, xaxis, _ = ax.hist(data, xaxis, histtype='stepfilled',
+    y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
                           lw=lw, color=color, edgecolor=edgecolor, stacked=True, *args, **kwargs)
 
     manager.set_x_axis(xaxis)
 
+    return y[-1], xaxis, stuff  # dangerous list index
 
 
 def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, scale=None,
@@ -182,25 +183,36 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
     :return:
     """
 
-    xaxis = _hist_init(data, bins, xrange=range)
+    if len(data) != 3:
 
-    if ax is None:
-        ax = plt.gca()
+        xaxis = _hist_init(data, bins, xrange=range)
 
-    if type(data) is pd.Series:
-        data = data.values
+        if ax is None:
+            ax = plt.gca()
 
-    if weights is None:
-        weights = np.ones(len(data))
+        if type(data) is pd.Series:
+            data = data.values
 
-    if scale is not None:
-        if isinstance(scale, int) or isinstance(scale, float):
-            if not isinstance(scale, bool):
-                weights *= scale
-        else:
-            print("Please provide int or float with scale")
+        if weights is None:
+            weights = np.ones(len(data))
 
-    y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
+        if scale is not None:
+            if isinstance(scale, int) or isinstance(scale, float):
+                if not isinstance(scale, bool):
+                    weights *= scale
+            else:
+                print("Please provide int or float with scale")
+
+        y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
+        err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
+        bin_centers = (x[1:] + x[:-1]) / 2.0
+
+    else:
+        bin_centers, y, err = data
+        if len(err) != 2:
+            err = err, err
+
+        xaxis = bin_centers
 
     if isinstance(color, int):
         color = b2cm[color % len(b2cm)]
@@ -208,9 +220,7 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
     if color is None:
         color = next(ax._get_lines.prop_cycler)["color"]
 
-    bin_centers = (x[1:] + x[:-1]) / 2.0
     # https://www-cdf.fnal.gov/physics/statistics
-    err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
     if normed:
         yom, x = np.histogram(data, xaxis, weights=weights)
         err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
@@ -230,10 +240,10 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
 
     if box:
         xerr = (x[:-1] - x[1:]) / 2.0
-        xerr = xerr[toplot]
+        xerr = xerr
         hi = err[0] + err[1]
         lo = y[toplot] - err[0]
-        plt.errorbar(bin_centers[toplot], y[toplot], color=color, xerr=xerr, fmt=' ')
+        plt.errorbar(bin_centers[toplot], y[toplot], color=color, xerr=xerr[toplot], fmt=' ')
         plt.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=.7,
                 width=2 * xerr,
                 edgecolor=color, *args, **kwargs)
@@ -242,7 +252,7 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
 
     manager.set_x_axis(xaxis)
 
-
+    return y, bin_centers, err
 
 
 def xlim(low=None, high=None, ax=None):
