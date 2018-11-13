@@ -169,8 +169,8 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
     return y[-1], xaxis, stuff  # dangerous list index
 
 
-def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, scale=None,
-              xerr=False, box=False, ax=None, weights=None, plot_zero=False, *args, **kwargs):
+def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, scale=None,
+              x_err=False, box=False, ax=None, weights=None, plot_zero=True, label=None, *args, **kwargs):
     """
 
     :param data:
@@ -183,36 +183,29 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
     :return:
     """
 
-    if len(data) != 3:
+    xaxis = _hist_init(data, bins, xrange=range)
 
-        xaxis = _hist_init(data, bins, xrange=range)
 
-        if ax is None:
-            ax = plt.gca()
+    if ax is None:
+        ax = plt.gca()
 
-        if type(data) is pd.Series:
-            data = data.values
+    if type(data) is pd.Series:
+        data = data.values
 
-        if weights is None:
-            weights = np.ones(len(data))
+    if weights is None:
+        weights = np.ones(len(data))
 
-        if scale is not None:
-            if isinstance(scale, int) or isinstance(scale, float):
-                if not isinstance(scale, bool):
-                    weights *= scale
-            else:
-                print("Please provide int or float with scale")
+    if scale is not None:
+        if isinstance(scale, int) or isinstance(scale, float):
+            if not isinstance(scale, bool):
+                weights *= scale
+        else:
+            print("Please provide int or float with scale")
 
-        y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
-        err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
-        bin_centers = (x[1:] + x[:-1]) / 2.0
+    y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
+    err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
+    bin_centers = (x[1:] + x[:-1]) / 2.0
 
-    else:
-        bin_centers, y, err = data
-        if len(err) != 2:
-            err = err, err
-
-        xaxis = bin_centers
 
     if isinstance(color, int):
         color = b2cm[color % len(b2cm)]
@@ -224,35 +217,51 @@ def errorbar(data, bins=None, color=None, normed=False, fmt='.', range=None, sca
     if normed:
         yom, x = np.histogram(data, xaxis, weights=weights)
         err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
-    if xerr is not False:
-        xerr = (x[1]-x[0])/2.0
+    if x_err is not False or box:
+        x_err = (x[1]-x[0])/2.0
     else:
-        xerr = None
+        x_err = None
 
-    toplot = np.ones(len(y)).astype(bool)
-
-    if plot_zero is False:
-
-        toplot[y == 0] = False
-        err = (err[0][[toplot]], err[1][toplot])
-        if xerr is not None:
-            xerr = xerr[toplot]
-
-    if box:
-        xerr = (x[:-1] - x[1:]) / 2.0
-        xerr = xerr
-        hi = err[0] + err[1]
-        lo = y[toplot] - err[0]
-        plt.errorbar(bin_centers[toplot], y[toplot], color=color, xerr=xerr[toplot], fmt=' ')
-        plt.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=.7,
-                width=2 * xerr,
-                edgecolor=color, *args, **kwargs)
-    else:
-        plt.errorbar(bin_centers[toplot], y[toplot], yerr=err, xerr=xerr, fmt=fmt, color=color, *args, **kwargs)
+    errorbar(bin_centers, y, err, x_err, box, plot_zero, fmt, color, ax, label=label)
 
     manager.set_x_axis(xaxis)
 
     return y, bin_centers, err
+
+
+def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='.',
+             color=None, ax=None, label=None, *args, **kwargs):
+
+    if ax is None:
+        ax = plt.gca()
+
+    if len(y_err) != 2:
+        y_err = y_err, y_err
+
+    if color is None:
+        color = next(ax._get_lines.prop_cycler)["color"]
+
+    toplot = np.ones(len(y)).astype(bool)
+
+    if plot_zero is False:
+        toplot[y == 0] = False
+        y_err = (y_err[0][[toplot]], y_err[1][toplot])
+        if x_err is not None:
+            x_err = x_err[toplot]
+        bin_centers = bin_centers[toplot]
+        y = y[toplot]
+
+    if box:
+        assert x_error is not None, "Please provide x-err"
+        hi = y_err[0] + y_err[1]
+        lo = y - y_err[0]
+        ax.errorbar(bin_centers, y, color=color, xerr=x_err, fmt=' ')
+        ax.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=.7,
+                width=2 * x_err, label=label,
+                edgecolor=color, *args, **kwargs)
+    else:
+        ax.errorbar(bin_centers, y, yerr=y_err, xerr=x_err, fmt=fmt, color=color,label=label, *args, **kwargs)
+
 
 
 def xlim(low=None, high=None, ax=None):

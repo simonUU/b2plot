@@ -2,7 +2,7 @@
 """ Analysis tools
 
 """
-
+import b2plot
 import numpy as np
 import matplotlib.pyplot as plt
 from .functions import _hist_init
@@ -69,3 +69,28 @@ def ratio(y1, y2, y1_err=None, y2_err= None):
     r = y1/y2
     re = np.sqrt((y1/(1.0*y2*y2))*(y1/(1.0*y2*y2))*y2e*y2e+(1/(1.0*y2))*(1/(1.0*y2))*y1e*y1e)
     return r, re
+
+
+def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
+                  y_label=None, figsize=None, ratio_range=(0, 2),
+                  *args, **kwarg):
+    f, axes = plt.subplots(2, 1, gridspec_kw={"height_ratios": [3, 1]}, sharex=True, figsize=figsize)
+    ax0 = axes[0]
+
+    hm = b2plot.hist(mc, lw=2, ax=ax0, label=label_mc, *args, **kwarg)
+    hd = b2plot.errorhist(data, ax=ax0, label=label_data, color='black')
+    ax0.legend()
+
+    ax1 = axes[1]
+    ry, rye = ratio(hd[0], hm[0])
+    b2plot.errorbar(hd[1], ry, rye, ax=ax1, color='grey')
+    ax1.axhline(1, color='grey', lw=0.5, ls='--')
+    f.subplots_adjust(hspace=0.1)
+
+    ax1.set_ylim(*ratio_range)
+    b2plot.xlim()
+    if y_label is not None:
+        ax0.set_ylabel(y_label)
+        ax1.set_ylabel("Ratio")
+        ax1.yaxis.set_label_coords(-0.08, 0.5)
+        ax0.yaxis.set_label_coords(-0.08, 0.5)
