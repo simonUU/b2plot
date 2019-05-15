@@ -7,7 +7,6 @@ import b2plot
 plt.style.use('belle2')
 
 
-
 import numpy as np
 import pandas as pd
 df = {'mass': np.append(np.random.random_sample(1000)*7 - 3.5, np.random.normal(0, 0.5, 1000))}

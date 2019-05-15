@@ -38,11 +38,11 @@ def text(t, x=0.8, y=0.9, fontsize=22, *args, **kwargs):
 
 
 STYLES_facecolor = [None, 'none', 'none', 'none', 'none', 'none']
-STYLES_hatches = [None, '///', r"\\\ ", ".+", 'xxx', '--', '++', 'xx', '//', '*', 'o', 'O', '.']
+STYLES_hatches = [None, '///', r"\\\ ",  'xxx', '--', '++', 'o', ".+", 'xx', '//', '*',  'O', '.']
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
-         label=None, fillalpha=0.5, *args, **kwargs):
+         label=None, edgecolor=None,  *args, **kwargs):
     """
 
     Args:
@@ -99,15 +99,17 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
         else:
             print("Please provide int or float with scale")
 
+    edgecolor = color if edgecolor is None else edgecolor
+
+
     if fill:
         # edgecolor = 'black' if style == 0 else color
         fc = (*color, fillalpha) if style == 0 else 'none'
         # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step',
         #                       lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                                    edgecolor=edgecolor, facecolor=fc, linewidth=lw, weights=weights, label=label,
-                                    color=color, *args, **kwargs)
-        TheManager.Instance().add_replot((y, xaxis))
+                                    edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                                    color=edgecolor, *args, **kwargs)
     else:
         y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
                                     label=label, *args, **kwargs)
