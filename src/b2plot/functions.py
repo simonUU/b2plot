@@ -4,7 +4,7 @@ In this file all the matplolib wrappers are located.
 
 """
 
-from .helpers import get_optimal_bin_size, manager
+from .helpers import get_optimal_bin_size, TheManager
 from .colors import b2cm
 import pandas as pd
 import numpy as np
@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 
 def _hist_init(data, bins=None, xrange=None):
-    xaxis = manager.get_x_axis()
+    xaxis = TheManager.Instance().get_x_axis()
     if xaxis is None or bins is not None or xrange is not None:
         if bins is None:
             bins = get_optimal_bin_size(len(data))
@@ -42,7 +42,7 @@ STYLES_hatches = [None, '///', r"\\\ ", ".+", 'xxx', '--', '++', 'xx', '//', '*'
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
-         label=None,  *args, **kwargs):
+         label=None, fillalpha=0.5, *args, **kwargs):
     """
 
     Args:
@@ -81,9 +81,11 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     # convert color
     if not isinstance(color, list) or isinstance(color, tuple):
         color = hex2color(color)
+    edgecolor = color
 
     if style is not None:
         fill = True
+
     else:
         style = 0
 
@@ -98,18 +100,31 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
             print("Please provide int or float with scale")
 
     if fill:
-        fc = (*color, 0.5) if style == 0 else 'none'
+        # edgecolor = 'black' if style == 0 else color
+        fc = (*color, fillalpha) if style == 0 else 'none'
         # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step',
         #                       lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                                    edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                                    edgecolor=edgecolor, facecolor=fc, linewidth=lw, weights=weights, label=label,
                                     color=color, *args, **kwargs)
+        TheManager.Instance().add_replot((y, xaxis))
     else:
         y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
                                     label=label, *args, **kwargs)
 
-    manager.set_x_axis(xaxis)
+    TheManager.Instance().set_x_axis(xaxis)
     return y, xaxis, patches
+
+
+def bar(y, binedges, ax=None, *args, **kwargs):
+
+    if ax is None:
+        ax = plt.gca()
+
+    x = (binedges[1:] + binedges[:-1]) / 2.0
+
+    return ax.hist(x, bins=binedges, weights=y,
+               *args, **kwargs)
 
 
 def to_stack(df, col, by):
@@ -164,7 +179,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
     y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
                           lw=lw, color=color, edgecolor=edgecolor, stacked=True, *args, **kwargs)
 
-    manager.set_x_axis(xaxis)
+    TheManager.Instance().set_x_axis(xaxis)
 
     return y[-1], xaxis, stuff  # dangerous list index
 
@@ -224,7 +239,7 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
 
     errorbar(bin_centers, y, err, x_err, box, plot_zero, fmt, color, ax, label=label)
 
-    manager.set_x_axis(xaxis)
+    TheManager.Instance().set_x_axis(xaxis)
 
     return y, bin_centers, err
 
@@ -275,7 +290,7 @@ def xlim(low=None, high=None, ax=None):
     Returns:
 
     """
-    xaxis = manager.get_x_axis()
+    xaxis = TheManager.Instance().get_x_axis()
     if xaxis is not None:
         if ax is None:
             ax = plt.gca()

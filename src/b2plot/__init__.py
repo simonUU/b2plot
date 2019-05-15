@@ -2,8 +2,8 @@ import pkg_resources
 
 __version__ = pkg_resources.get_distribution(__name__).version
 
-from .functions import hist, errorbar, stacked, to_stack, xlim, sig_bkg_plot, errorhist
-from .helpers import xaxis, nf, figure
+from .functions import hist, errorbar, stacked, to_stack, xlim, sig_bkg_plot, errorhist, bar
+from .helpers import xaxis, nf, figure, replot
 from .decorations import draw_y_label, decorate, expand, watermark, lumi, labels
 from .colors import cm, b2helix
 
