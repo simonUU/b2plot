@@ -4,6 +4,9 @@ Helper function and classes are defined here.
 
 """
 
+import b2plot
+# from .functions import bar
+
 
 import matplotlib.pyplot as plt
 
@@ -93,6 +96,7 @@ class Singleton:
 class TheManager:
     def __init__(self):
         self.xaxis = None
+        self.toreplot = []
 
     def get_x_axis(self):
         return self.xaxis
@@ -100,23 +104,36 @@ class TheManager:
     def set_x_axis(self, axis):
         self.xaxis = axis
 
-    def figure(self):
+    def figure(self, *args, **kwargs):
         # f = plt.figure(tight_layout={'pad': 0})
-        f = plt.figure()
+        f = plt.figure(*args, **kwargs)
         self.xaxis = None
+        self.toreplot = []
         return f
+
+    def add_replot(self, h):
+        self.toreplot.append(h)
+
+    def replot(self, ecolor='black'):
+        for h in self.toreplot:
+
+            b2plot.bar(h[0], h[1], lw=1, histtype='step', color='black' )
 
 
 manager = TheManager.Instance()
 
 
 def xaxis():
-    return manager.get_x_axis()
+    return TheManager.Instance().get_x_axis()
 
 
 def nf():
-    return manager.figure()
+    return TheManager.Instance().figure()
 
 
-def figure():
-    return manager.figure()
+def figure(*args, **kwargs):
+    return TheManager.Instance().figure(*args, **kwargs)
+
+def replot():
+    print("replotting")
+    TheManager.Instance().replot()
