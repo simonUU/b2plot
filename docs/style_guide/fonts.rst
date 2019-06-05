@@ -8,7 +8,7 @@ specific recommendations. In general there are *Serif* fonts, which are
 more traditionally looking, and *Sans-Serif* fonts, which have a more
 modern appeal.
 
-**Which font you choose, may however be subject to the jurnal.**
+**Which font you choose, may however be subject to the journal.**
 
 .. figure:: img/4_sans.png
    :alt: CubeHelix
