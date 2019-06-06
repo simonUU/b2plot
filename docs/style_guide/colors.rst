@@ -28,9 +28,9 @@ Diverging Colormap
 For showing differences, choose a **Diverging Colormap**.
 
 .. figure:: img/3_diff.png
-   :alt: CubeHelix
+   :alt: Diverging Colormap
 
-   CubeHelix
+   Example diverging colormap
 
 
 Possible Colormaps
