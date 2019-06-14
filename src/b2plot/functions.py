@@ -101,7 +101,6 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
 
     edgecolor = color if edgecolor is None else edgecolor
 
-
     if fill:
         # edgecolor = 'black' if style == 0 else color
         fc = (*color, fillalpha) if style == 0 else 'none'
@@ -202,7 +201,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
 
     xaxis = _hist_init(data, bins, xrange=range)
 
-
     if ax is None:
         ax = plt.gca()
 
@@ -222,7 +220,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
     y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
     err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
     bin_centers = (x[1:] + x[:-1]) / 2.0
-
 
     if isinstance(color, int):
         color = b2cm[color % len(b2cm)]
@@ -269,7 +266,7 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
         y = y[toplot]
 
     if box:
-        assert x_error is not None, "Please provide x-err"
+        assert x_err is not None, "Please provide x-err"
         hi = y_err[0] + y_err[1]
         lo = y - y_err[0]
         ax.errorbar(bin_centers, y, color=color, xerr=x_err, fmt=' ')
@@ -278,7 +275,6 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
                 edgecolor=color, *args, **kwargs)
     else:
         ax.errorbar(bin_centers, y, yerr=y_err, xerr=x_err, fmt=fmt, color=color,label=label, *args, **kwargs)
-
 
 
 def xlim(low=None, high=None, ax=None):

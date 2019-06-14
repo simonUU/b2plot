@@ -35,7 +35,7 @@ mathtext.default : it # The default font to use for math.
 
 
 font.family: sans-serif
-font.sans-serif: Helvetia, Arial, Liberation Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif
+font.sans-serif: DejaVu Sans, Helvetia, Arial, Liberation Sans, Bitstream Vera Sans, sans-serif
 
 axes.labelcolor: .15
 axes.labelsize      : 22
@@ -88,3 +88,7 @@ ytick.minor.size: 3
 
 xtick.major.pad      : 6.
 ytick.major.pad      : 6.
+
+
+
+errorbar.capsize :  0

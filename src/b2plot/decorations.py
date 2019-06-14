@@ -8,12 +8,30 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 
-def draw_y_label(label='Entries', unit=None, ha='right', *args, **kwargs):
+def draw_y_label(label='Entries', unit=None, ha='right', brackets=True, *args, **kwargs):
     """ Plotting scientific notation y label
-    :param label:
-    :param unit:
-    :return:
+
+
+    Args:
+        label:
+        unit:
+        ha:
+        brackets:
+        *args:
+        **kwargs:
+
+    Returns:
+
     """
+    br_open = ''
+    br_close = ''
+    if brackets:
+        br_open = ' ('
+        br_close = ')'
+    if brackets == 'square':
+        br_open = ' ['
+        br_close = ']'
+
     x_axis = manager.get_x_axis()
     if unit is None:
         plt.ylabel(label, ha=ha, *args, **kwargs)
@@ -21,12 +39,12 @@ def draw_y_label(label='Entries', unit=None, ha='right', *args, **kwargs):
         try:
             width = x_axis[1] - x_axis[0]
         except TypeError:
-            plt.ylabel(label+' / ' + unit, ha=ha, *args, **kwargs)
+            plt.ylabel(label+' /' + br_open + ' ' + unit + br_close, ha=ha, *args, **kwargs)
         else:
-            plt.ylabel(label+' / %.3f' % width + ' ' + unit, ha=ha, *args, **kwargs)
+            plt.ylabel(label+' / ' + br_open + '%.3f' % width + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
-def watermark(t="2018 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  *args, **kwargs):
+def watermark(t="2019 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  *args, **kwargs):
     # font = FontProperties()
     # font.set_style('italic')
     # font.set_weight('bold')
@@ -69,29 +87,38 @@ def set_style():
     plt.subplots_adjust(left=0.15, right=0.92, top=0.92, bottom=0.15)
 
 
-def labels(xlabel=None, ylabel=None, unit=None, root_style=False, *args, **kwargs):
+def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True, *args, **kwargs):
+
+    br_open = ''
+    br_close = ''
+    if brackets:
+        br_open = ' ('
+        br_close = ')'
+    if brackets == 'square':
+        br_open = ' ['
+        br_close = ']'
 
     ha = 'center'
-    x,y = .5, .5
+    x, y = .5, .5
 
     if root_style:
         ha = 'right'
-        x,y = 1,1
+        x, y = 1, 1
 
     if xlabel is not None:
         plt.xlabel(xlabel, horizontalalignment=ha, x=x, *args, **kwargs)
 
     if unit is not None:
         if unit is not '':
-            plt.xlabel(xlabel + ' [' + unit + ']', ha=ha, x=x, *args, **kwargs)
+            plt.xlabel(xlabel + br_open + unit + br_close, ha=ha, x=x, *args, **kwargs)
         if ylabel is not None:
-            draw_y_label(ylabel, unit,  horizontalalignment=ha, y=y,  *args, **kwargs)
+            draw_y_label(ylabel, unit,  horizontalalignment=ha, y=y, brackets=brackets, *args, **kwargs)
     else:
         if xlabel is not None:
-            plt.xlabel(xlabel, horizontalalignment=ha, x=x, *args, **kwargs)
+            plt.xlabel(xlabel, horizontalalignment=ha, x=x, brackets=brackets, *args, **kwargs)
         if ylabel is not None:
-            draw_y_label(ylabel,  horizontalalignment=ha, y=y,  *args, **kwargs)
+            draw_y_label(ylabel,  horizontalalignment=ha, y=y, brackets=brackets, *args, **kwargs)
 
 
-def decorate( *args, **kwargs):
-    labels( *args, **kwargs)
+def decorate(*args, **kwargs):
+    labels(*args, **kwargs)
