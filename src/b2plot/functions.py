@@ -42,7 +42,7 @@ STYLES_hatches = [None, '///', r"\\\ ",  'xxx', '--', '++', 'o', ".+", 'xx', '//
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
-         label=None, edgecolor=None,  *args, **kwargs):
+         label=None, edgecolor=None, fillalpha=0.5, *args, **kwargs):
     """
 
     Args:
@@ -81,7 +81,6 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     # convert color
     if not isinstance(color, list) or isinstance(color, tuple):
         color = hex2color(color)
-    edgecolor = color
 
     if style is not None:
         fill = True
@@ -107,8 +106,8 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
         # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step',
         #                       lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                                    edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
-                                    color=edgecolor, *args, **kwargs)
+                                    edgecolor=edgecolor, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                                    color=color, *args, **kwargs)
     else:
         y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
                                     label=label, *args, **kwargs)
@@ -297,7 +296,21 @@ def xlim(low=None, high=None, ax=None):
         ax.set_xlim(low, high)
 
 
-def save(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs):
+def save(filename,  *args, **kwargs):
+    """ Save a file and do the subplot_adjust to fit the page with larger labels
+
+    Args:
+        filename:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    plt.savefig(filename, bbox_inches='tight', *args, **kwargs)
+
+
+def save_adjust(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs):
     """ Save a file and do the subplot_adjust to fit the page with larger labels
 
     Args:
@@ -308,12 +321,12 @@ def save(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs
         top:
         *args:
         **kwargs:
-
+bbox_inches='tight',
     Returns:
 
     """
     plt.subplots_adjust(bottom=bottom, left=left, right=right, top=top)
-    plt.savefig(filename, *args, **kwargs)
+    plt.savefig(filename,  *args, **kwargs)
 
 
 def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None):

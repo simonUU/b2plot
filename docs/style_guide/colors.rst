@@ -35,4 +35,14 @@ For showing differences, choose a **Diverging Colormap**.
 
 Possible Colormaps
 ------------------
+s
+
+* `Tango Colormap <https://sobac.com/sobac/tangocolors.htm>`_
+* `Solarized <https://ethanschoonover.com/solarized/>`_
+* `Groovebox <https://github.com/morhetz/gruvbox>`_
+
+.. figure:: img/3_examples.png
+   :alt: Examples
+
+   Examples
 

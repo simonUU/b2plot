@@ -41,7 +41,7 @@ def draw_y_label(label='Entries', unit=None, ha='right', brackets=True, *args, *
         except TypeError:
             plt.ylabel(label+' /' + br_open + ' ' + unit + br_close, ha=ha, *args, **kwargs)
         else:
-            plt.ylabel(label+' / ' + br_open + '%.3f' % width + ' ' + unit + br_close, ha=ha, *args, **kwargs)
+            plt.ylabel(label+' /' + br_open + "{0:.3f}".format(width).rstrip('0').rstrip('.') + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
 def watermark(t="2019 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  *args, **kwargs):
