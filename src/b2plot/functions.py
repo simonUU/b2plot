@@ -42,7 +42,7 @@ STYLES_hatches = [None, '///', r"\\\ ",  'xxx', '--', '++', 'o', ".+", 'xx', '//
 
 
 def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, color=None, scale=None, weights=None,
-         label=None, edgecolor=None,  *args, **kwargs):
+         label=None, edgecolor=None, fillalpha=0.5, *args, **kwargs):
     """
 
     Args:
@@ -81,11 +81,12 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     # convert color
     if not isinstance(color, list) or isinstance(color, tuple):
         color = hex2color(color)
-    edgecolor = color
+    # edgecolor = color if edgecolor is None else edgecolor
 
     if style is not None:
         fill = True
-
+        if style==0 and edgecolor is None:
+            edgecolor = 'black'
     else:
         style = 0
 
@@ -108,7 +109,7 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
         # y, xaxis, _ = ax.hist(data, xaxis, range=range, histtype='step',
         #                       lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
-                                    edgecolor=color, facecolor=fc, linewidth=lw, weights=weights, label=label,
+                                    edgecolor=edgecolor, facecolor=fc, linewidth=lw, weights=weights, label=label,
                                     color=edgecolor, *args, **kwargs)
     else:
         y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
