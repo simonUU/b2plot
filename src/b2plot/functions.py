@@ -81,7 +81,6 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
     # convert color
     if not isinstance(color, list) or isinstance(color, tuple):
         color = hex2color(color)
-    # edgecolor = color if edgecolor is None else edgecolor
 
     if style is not None:
         fill = True
@@ -102,7 +101,6 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
 
     edgecolor = color if edgecolor is None else edgecolor
 
-
     if fill:
         # edgecolor = 'black' if style == 0 else color
         fc = (*color, fillalpha) if style == 0 else 'none'
@@ -110,7 +108,7 @@ def hist(data, bins=None, fill=False, range=None, lw=1., ax=None, style=None, co
         #                       lw=lw, color=color, weights=weights, *args, **kwargs)
         y, xaxis, patches = ax.hist(data, xaxis, range=range, lw=lw, histtype='stepfilled', hatch=STYLES_hatches[style],
                                     edgecolor=edgecolor, facecolor=fc, linewidth=lw, weights=weights, label=label,
-                                    color=edgecolor, *args, **kwargs)
+                                    color=color, *args, **kwargs)
     else:
         y, xaxis, patches = ax.hist(data, xaxis, range=range, histtype='step', lw=lw, color=color, weights=weights,
                                     label=label, *args, **kwargs)
@@ -203,7 +201,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
 
     xaxis = _hist_init(data, bins, xrange=range)
 
-
     if ax is None:
         ax = plt.gca()
 
@@ -223,7 +220,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
     y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
     err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
     bin_centers = (x[1:] + x[:-1]) / 2.0
-
 
     if isinstance(color, int):
         color = b2cm[color % len(b2cm)]
@@ -270,7 +266,7 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
         y = y[toplot]
 
     if box:
-        assert x_error is not None, "Please provide x-err"
+        assert x_err is not None, "Please provide x-err"
         hi = y_err[0] + y_err[1]
         lo = y - y_err[0]
         ax.errorbar(bin_centers, y, color=color, xerr=x_err, fmt=' ')
@@ -279,7 +275,6 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
                 edgecolor=color, *args, **kwargs)
     else:
         ax.errorbar(bin_centers, y, yerr=y_err, xerr=x_err, fmt=fmt, color=color,label=label, *args, **kwargs)
-
 
 
 def xlim(low=None, high=None, ax=None):
@@ -302,7 +297,21 @@ def xlim(low=None, high=None, ax=None):
         ax.set_xlim(low, high)
 
 
-def save(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs):
+def save(filename,  *args, **kwargs):
+    """ Save a file and do the subplot_adjust to fit the page with larger labels
+
+    Args:
+        filename:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    plt.savefig(filename, bbox_inches='tight', *args, **kwargs)
+
+
+def save_adjust(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs):
     """ Save a file and do the subplot_adjust to fit the page with larger labels
 
     Args:
@@ -313,12 +322,12 @@ def save(filename, bottom=0.15, left=0.13, right=0.96, top=0.95, *args, **kwargs
         top:
         *args:
         **kwargs:
-
+bbox_inches='tight',
     Returns:
 
     """
     plt.subplots_adjust(bottom=bottom, left=left, right=right, top=top)
-    plt.savefig(filename, *args, **kwargs)
+    plt.savefig(filename,  *args, **kwargs)
 
 
 def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None):
