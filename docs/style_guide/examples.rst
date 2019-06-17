@@ -20,3 +20,8 @@ Example of different style file settings:
    :alt: Examples
 
 
+.. figure:: img/5_belle2_wg1.png
+   :alt: Examples
+
+
+
