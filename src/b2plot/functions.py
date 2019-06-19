@@ -236,7 +236,8 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
     else:
         x_err = None
 
-    errorbar(bin_centers, y, err, x_err, box, plot_zero, fmt, color, ax, label=label)
+    errorbar(bin_centers, y, err, x_err, box, plot_zero, fmt, color, ax, label=label, *args, **kwargs)
+
 
     TheManager.Instance().set_x_axis(xaxis)
 

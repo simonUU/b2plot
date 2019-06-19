@@ -44,21 +44,38 @@ def draw_y_label(label='Entries', unit=None, ha='right', brackets=True, *args, *
             plt.ylabel(label+' /' + br_open + "{0:.3f}".format(width).rstrip('0').rstrip('.') + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
-def watermark(t="2019 (preliminary)", px=0.5, py=0.9, fontsize=16, alpha=0.95,  *args, **kwargs):
-    # font = FontProperties()
-    # font.set_style('italic')
-    # font.set_weight('bold')
+def watermark(t=None,logo="Belle II", px=0.5, py=0.92, fontsize=16, alpha=0.7, alpha_logo=0.95, shift=0.08,  *args, **kwargs):
+    """
 
-    plt.text(px, py, "Belle II", ha='right',
+    Args:
+        t:
+        logo:
+        px:
+        py:
+        fontsize:
+        alpha:
+        shift:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    if t is None:
+        import datetime
+        t = " %d (internal)" % datetime.date.today().year
+
+    plt.text(px, py, logo, ha='center',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              style='italic',
-             alpha=alpha,  *args, **kwargs,
+             alpha=alpha_logo,
              weight='bold',
+             *args, **kwargs,
              # fontproperties=font,
              # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
              )
-    plt.text(px + 0.02, py, t, ha='left',
+    plt.text(px + shift, py, t, ha='left',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              #          style='italic',
@@ -115,7 +132,7 @@ def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True,
             draw_y_label(ylabel, unit,  horizontalalignment=ha, y=y, brackets=brackets, *args, **kwargs)
     else:
         if xlabel is not None:
-            plt.xlabel(xlabel, horizontalalignment=ha, x=x, brackets=brackets, *args, **kwargs)
+            plt.xlabel(xlabel, horizontalalignment=ha, x=x,  *args, **kwargs)
         if ylabel is not None:
             draw_y_label(ylabel,  horizontalalignment=ha, y=y, brackets=brackets, *args, **kwargs)
 
