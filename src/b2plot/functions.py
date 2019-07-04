@@ -138,8 +138,8 @@ def to_stack(df, col, by):
     return x_data
 
 
-def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black',
-            *args, **kwargs):
+def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black', weights=None,
+            scale=None, *args, **kwargs):
     """ Create stacked histogram
 
     Args:
@@ -175,10 +175,23 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
         if n_stacks < 20:
             color = b2helix(n_stacks)
 
+    if weights is None:
+        weights = []
+        for d in data:
+            wei = np.ones(len(d))
+            if scale is not None:
+                if isinstance(scale, int) or isinstance(scale, float):
+                    if not isinstance(scale, bool):
+                        wei *= scale
+                else:
+                    print("Please provide int or float with scale")
+            weights.append(wei)
+
+
     xaxis = _hist_init(data[0], bins, xrange=range)
 
     y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
-                          lw=lw, color=color, edgecolor=edgecolor, stacked=True, *args, **kwargs)
+                          lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, *args, **kwargs)
 
     TheManager.Instance().set_x_axis(xaxis)
 
