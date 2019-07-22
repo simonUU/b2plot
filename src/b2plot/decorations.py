@@ -44,7 +44,7 @@ def draw_y_label(label='Entries', unit=None, ha='right', brackets=True, *args, *
             plt.ylabel(label+' /' + br_open + "{0:.3f}".format(width).rstrip('0').rstrip('.') + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
-def watermark(t=None,logo="Belle II", px=0.5, py=0.92, fontsize=16, alpha=0.7, alpha_logo=0.95, shift=0.08,  *args, **kwargs):
+def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8, alpha_logo=0.95, shift=0.15,  *args, **kwargs):
     """
 
     Args:
@@ -65,7 +65,7 @@ def watermark(t=None,logo="Belle II", px=0.5, py=0.92, fontsize=16, alpha=0.7, a
         import datetime
         t = " %d (internal)" % datetime.date.today().year
 
-    plt.text(px, py, logo, ha='center',
+    plt.text(px, py, logo, ha='left',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
              style='italic',
@@ -85,8 +85,12 @@ def watermark(t=None,logo="Belle II", px=0.5, py=0.92, fontsize=16, alpha=0.7, a
              )
 
 
-def lumi(l="$5\; pb^{-1}$", px=0.75, py=0.85,):
-    plt.text(px, py, "$\int\,L\,dt\;=\;$" + l, transform=plt.gca().transAxes, )
+def lumi(l="$5\; pb^{-1}$", px=0.033, py=0.839,  *args, **kwargs):
+    plt.text(px, py, "$\int\,L\,dt\;=\;$" + l, transform=plt.gca().transAxes, *args, **kwargs )
+
+
+def text(t, px=0.033, py=0.763,  *args, **kwargs):
+    plt.text(px, py, t, transform=plt.gca().transAxes, *args, **kwargs)
 
 
 def expand(factor =1.2):
@@ -109,11 +113,11 @@ def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True,
     br_open = ''
     br_close = ''
     if brackets:
-        br_open = ' ('
-        br_close = ')'
-    if brackets == 'square':
         br_open = ' ['
         br_close = ']'
+    if brackets == 'round':
+        br_open = ' ('
+        br_close = ')'
 
     ha = 'center'
     x, y = .5, .5

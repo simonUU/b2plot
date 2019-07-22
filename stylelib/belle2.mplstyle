@@ -3,25 +3,34 @@
 # Belle II Style
 #
 
-# .15 = dark_gray
-# .8 = light_gray
-figure.facecolor: white
-# figure.figsize: 7.0, 4.326 # : 8, 4.944
-figure.figsize: 8.0, 5.5 #6.4, 4.4
 
-text.color: .1
-font.size: 15
+# General Settings
+figure.figsize      : 8.0, 5.5 #6.4, 4.4
+figure.facecolor    : white
+text.color          : .1
+
+# Fonts
+
+font.size           : 15
+xtick.labelsize     : 15
+ytick.labelsize     : 15
+axes.labelsize      : 22
+legend.fontsize: 15
+
+axes.labelcolor     : .1
+
+font.family         : sans-serif
+font.sans-serif     : Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Arial, Liberation Sans, sans-serif
+
+# Text in math mode
 text.usetex         : False
-
-
-# future.
-mathtext.cal : cursive
-mathtext.rm  : serif
-mathtext.tt  : monospace
-mathtext.it  : serif:italic
-mathtext.bf  : serif:bold
-mathtext.sf  : sans
-mathtext.fontset : dejavusans # Should be 'dejavusans' (default),
+mathtext.cal        : cursive
+mathtext.rm         : serif
+mathtext.tt         : monospace
+mathtext.it         : serif:italic
+mathtext.bf         : serif:bold
+mathtext.sf         : sans
+mathtext.fontset    : dejavusans # Should be 'dejavusans' (default),
                                # 'dejavuserif', 'cm' (Computer Modern), 'stix',
                                # 'stixsans' or 'custom'
 mathtext.fallback_to_cm : True  # When True, use symbols from the Computer Modern
@@ -34,15 +43,12 @@ mathtext.default : it # The default font to use for math.
                        # used in regular text.
 
 
-font.family: sans-serif
-font.sans-serif:    Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Arial, Liberation Sans, sans-serif
-
-axes.labelcolor: .1
-axes.labelsize      : 22
-
 legend.frameon: False
 legend.numpoints: 1
 legend.scatterpoints: 1
+
+
+# Ticks
 
 xtick.direction: in
 ytick.direction: in
@@ -51,10 +57,16 @@ ytick.color: .1
 xtick.minor.visible : True
 ytick.minor.visible : True
 ytick.left           : True
-ytick.right          : True
-xtick.top            : True
+ytick.right          : False
+xtick.top            : False
 xtick.bottom         : True
+xtick.major.size: 6
+ytick.major.size: 6
+xtick.minor.size: 3
+ytick.minor.size: 3
 
+xtick.major.pad      : 6.
+ytick.major.pad      : 6.
 axes.axisbelow: False
 image.cmap: viridis
 
@@ -74,13 +86,5 @@ axes.labelpad       : 6.0
 axes.autolimit_mode : round_numbers
 
 grid.color: .8
-xtick.major.size: 6
-ytick.major.size: 6
-xtick.minor.size: 3
-ytick.minor.size: 3
 
-xtick.major.pad      : 6.
-ytick.major.pad      : 6.
-
-
-errorbar.capsize :  3
+errorbar.capsize :  0
