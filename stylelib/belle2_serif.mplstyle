@@ -39,7 +39,7 @@ font.serif:  Latin Modern Math, DejaVu Serif, serif
 
 
 axes.labelcolor: .1
-axes.labelsize      : 22
+axes.labelsize      : 24
 
 legend.frameon: False
 legend.numpoints: 1
