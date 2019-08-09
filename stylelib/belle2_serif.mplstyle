@@ -10,7 +10,7 @@ figure.facecolor: white
 figure.figsize: 8, 5.5 #6.4, 4.4
 
 text.color: .1
-font.size: 16
+font.size: 15
 text.usetex         : False
 
 
@@ -35,11 +35,11 @@ mathtext.default : it # The default font to use for math.
 
 
 font.family: serif
-font.serif:  Latin Modern Math, DejaVu Serif, serif
+font.serif:  serif,  Latin Modern Math, DejaVu Serif, serif
 
 
 axes.labelcolor: .1
-axes.labelsize      : 24
+axes.labelsize      : 22
 
 legend.frameon: False
 legend.numpoints: 1

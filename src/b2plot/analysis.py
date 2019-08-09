@@ -37,7 +37,6 @@ def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
         tmp = y
 
 
-
 def profile(x, y, bins=None, range=None, fmt='.', *args, **kwargs):
     import scipy
 

@@ -44,7 +44,7 @@ def draw_y_label(label='Entries', unit=None, ha='right', brackets=True, *args, *
             plt.ylabel(label+' /' + br_open + "{0:.3f}".format(width).rstrip('0').rstrip('.') + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
-def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8, alpha_logo=0.95, shift=0.15,  *args, **kwargs):
+def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8, alpha_logo=0.95, shift=0.15, bstyle='italic', *args, **kwargs):
     """
 
     Args:
@@ -68,7 +68,7 @@ def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8
     plt.text(px, py, logo, ha='left',
              transform=plt.gca().transAxes,
              fontsize=fontsize,
-             style='italic',
+             style=bstyle,
              alpha=alpha_logo,
              weight='bold',
              *args, **kwargs,
@@ -85,8 +85,8 @@ def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8
              )
 
 
-def lumi(l="$5\; pb^{-1}$", px=0.033, py=0.839,  *args, **kwargs):
-    plt.text(px, py, "$\int\,L\,dt\;=\;$" + l, transform=plt.gca().transAxes, *args, **kwargs )
+def lumi(l="$5\; \mathrm{pb}^{-1}$", px=0.033, py=0.839,  *args, **kwargs):
+    plt.text(px, py, "$\int\,L\,\mathrm{dt}\;=\;$" + l, transform=plt.gca().transAxes, *args, **kwargs )
 
 
 def text(t, px=0.033, py=0.763,  *args, **kwargs):
