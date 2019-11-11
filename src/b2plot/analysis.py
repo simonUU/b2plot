@@ -11,12 +11,17 @@ from .functions import _hist_init
 def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
     """ Plotting differences of sig distribution in percentiles of tag distribution
 
-    :param sig:
-    :param tag:
-    :param ax:
-    :param percent_step:
-    :return:
+    Args:
+        sig:
+        tag:
+        bins:
+        ax:
+        xrange:
+        percent_step:
+
     """
+
+
 
     if ax is None:
         fix, ax = plt.subplots()
@@ -93,3 +98,47 @@ def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
         ax1.set_ylabel("Ratio")
         ax1.yaxis.set_label_coords(-0.08, 0.5)
         ax0.yaxis.set_label_coords(-0.08, 0.5)
+
+
+def purity_hist(x, mask, nbins=10, ax=None):
+    """ Plots the distribution x in an equal frequency binning with the purity regarding mask
+
+    Args:
+        x: Distribution
+        mask: boolean list for signal and background flags
+        nbins: number of bins for the histogram
+
+    Returns:
+
+    """
+
+    x = x[np.isfinite(x)]
+    bins = np.percentile(x, np.linspace(0, 100, nbins))
+
+    y_, _ = np.histogram(x, bins)
+    y_1, _ = np.histogram(x[mask], bins)
+    y_0, _ = np.histogram(x[~mask], bins)
+
+    pur = y_1 / (y_1 + y_0)
+    pur_err = (pur * (1 - pur)) / (y_)
+
+    x_ = np.arange(len(y_) + 1)
+    x_centers = (x_[1:] + x_[:-1]) / 2.
+
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.bar(x_[:-1], y_, width=np.diff(x_), ec="k", align="edge")
+    ax.bar(x_[:-1], y_0, width=np.diff(x_), ec="k", align="edge", color='white')
+
+    ax2 = ax.twinx()
+    ax2.errorbar(x_centers, pur, np.sqrt(pur_err), color='black', fmt="o--")
+    ax2.set_xticklabels([], [])
+    ax2.set_xticks([], [])
+
+    ax2.set_ylabel("Purity")
+    ax2.set_ylim(0)
+    ax.bar(x_[:-1], y_1, width=np.diff(x_), ec="k", align="edge")
+
+    np.append(bins, x.max())
+    _ = ax.set_xticks(x_)
+    _ = ax.set_xticklabels(['%3.3e' % f for f in bins], rotation=90, fontfamily='monospace')

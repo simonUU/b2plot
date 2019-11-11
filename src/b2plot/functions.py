@@ -344,7 +344,22 @@ bbox_inches='tight',
     plt.savefig(filename,  *args, **kwargs)
 
 
-def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None):
+def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, normed=False):
+    """
+
+    Args:
+        df:
+        col:
+        by:
+        ax:
+        bins:
+        range:
+        labels:
+        normed:
+
+    Returns:
+
+    """
 
     # foreseen usage
     if isinstance(df, pd.DataFrame):
@@ -370,8 +385,8 @@ def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None):
     if labels is None:
         labels = ["Background", "Signal"]
 
-    hist(x_bkg, xaxis, style=0, label=labels[0], ax=ax)
-    hist(x_sig, xaxis, lw=2, color=0, label=labels[1], ax=ax)
+    hist(x_bkg, xaxis, style=0, label=labels[0], ax=ax, density=normed)
+    hist(x_sig, xaxis, lw=2, color=0, label=labels[1], ax=ax, density=normed)
 
     plt.legend()
     xlim()
