@@ -135,7 +135,7 @@ def to_stack(df, col, by):
     x_data = []
     for gr in g.groups:
         x_data.append(g.get_group(gr)[col].values)
-    return x_data
+    return (x_data,g.groups)
 
 
 def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black', weights=None,
@@ -160,11 +160,11 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
         assert col is not None, "Please provide column"
         assert by is not None, "Please provide by"
 
-        data = to_stack(df, col, by)
+        (data, labels) = to_stack(df, col, by)
 
     else:
         assert isinstance(df, list), "Please provide DataFrame or List"
-        data = df
+        (data,labels) = (df,[None])
 
     if ax is None:
         ax = plt.gca()
@@ -190,8 +190,8 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     xaxis = _hist_init(data[0], bins, xrange=range)
 
-    y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
-                          lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, *args, **kwargs)
+    y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled', label=labels,
+            lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, *args, **kwargs)
 
     TheManager.Instance().set_x_axis(xaxis)
 
