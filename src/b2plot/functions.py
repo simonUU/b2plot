@@ -169,6 +169,7 @@ def to_stack(df, col, by, transform=None):
     return [x_data[i] for i in inds], cats[inds]
 
 
+
 def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black', weights=None,
             scale=None, label=None, transform=None, *args, **kwargs):
     """ Create stacked histogram
@@ -195,9 +196,10 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
         if label is None:
             label = cats
 
+
     else:
         assert isinstance(df, list), "Please provide DataFrame or List"
-        data = df
+        (data,labels) = (df,[None])
 
     if ax is None:
         ax = plt.gca()
@@ -225,6 +227,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
                           lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, label=label, *args, **kwargs)
+
 
     TheManager.Instance().set_x_axis(xaxis)
 
@@ -283,7 +286,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
         x_err = None
 
     errorbar(bin_centers, y, err, x_err, box, plot_zero, fmt, color, ax, label=label, *args, **kwargs)
-
 
     TheManager.Instance().set_x_axis(xaxis)
 
