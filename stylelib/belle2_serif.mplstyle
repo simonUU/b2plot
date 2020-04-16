@@ -10,7 +10,7 @@ figure.facecolor: white
 figure.figsize: 8, 5.5 #6.4, 4.4
 
 text.color: .1
-font.size: 15
+font.size: 16
 text.usetex         : False
 
 
@@ -35,7 +35,7 @@ mathtext.default : it # The default font to use for math.
 
 
 font.family: serif
-font.serif:  serif,  Latin Modern Math, DejaVu Serif, serif
+font.serif:  Latin Modern Math, DejaVu Serif, serif
 
 
 axes.labelcolor: .1
@@ -52,8 +52,8 @@ ytick.color: .1
 xtick.minor.visible : True
 ytick.minor.visible : True
 ytick.left           : True
-ytick.right          : False
-xtick.top            : False
+ytick.right          : True
+xtick.top            : True
 xtick.bottom         : True
 
 axes.axisbelow: False
@@ -67,7 +67,7 @@ axes.grid: False
 axes.facecolor: white
 axes.edgecolor: .0
 axes.linewidth: 1.2
-axes.formatter.limits : -4, 4
+axes.formatter.limits : -7, 7
 axes.prop_cycle: cycler('color', ['348ABD','E24A33', '988ED5', '777777', 'FBC15E', '8EBA42', 'FFB5B8'])
 #axes.formatter.use_mathtext : True
 axes.formatter.useoffset      : False
@@ -83,6 +83,3 @@ ytick.minor.size: 3
 
 xtick.major.pad      : 6.
 ytick.major.pad      : 6.
-
-
-errorbar.capsize :  0

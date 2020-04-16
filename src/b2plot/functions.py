@@ -14,13 +14,36 @@ import matplotlib.pyplot as plt
 
 
 def _hist_init(data, bins=None, xrange=None):
+    """ Performs and stores or returns the binning
+
+    Args:
+        data:
+        bins:
+        xrange:
+
+    Returns:
+
+    """
     xaxis = TheManager.Instance().get_x_axis()
+
     if xaxis is None or bins is not None or xrange is not None:
         if bins is None:
             bins = get_optimal_bin_size(len(data))
         _, xaxis = np.histogram(data, bins, xrange)
 
     return xaxis
+
+
+def set_xaxis(bins, flat=False):
+    TheManager.Instance().set_x_axis(bins)
+
+
+def get_xaxis():
+    return TheManager.Instance().get_x_axis()
+
+
+def flat_x(x, nbins=25):
+    set_xaxis(np.percentile(x, np.linspace(0, 100, nbins)))
 
 
 def text(t, x=0.8, y=0.9, fontsize=22, *args, **kwargs):
@@ -127,19 +150,27 @@ def bar(y, binedges, ax=None, *args, **kwargs):
     return ax.hist(x, bins=binedges, weights=y,
                *args, **kwargs)
 
+def _notransform(x):
+    return x
 
-def to_stack(df, col, by):
+def to_stack(df, col, by, transform=None):
 
     g = df.groupby(by)
-
+    transform = _notransform if transform is None else transform
     x_data = []
     for gr in g.groups:
-        x_data.append(g.get_group(gr)[col].values)
-    return x_data
+        x_data.append(transform(g.get_group(gr)[col].values))
+    
+    cats = np.array([gg for gg in g.groups])
+    x_len = np.array([len(x) for x in x_data])
+    inds = x_len.argsort()
+    # print(cats)
+    # print(inds)
+    return [x_data[i] for i in inds], cats[inds]
 
 
 def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black', weights=None,
-            scale=None, *args, **kwargs):
+            scale=None, label=None, transform=None, *args, **kwargs):
     """ Create stacked histogram
 
     Args:
@@ -160,7 +191,9 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
         assert col is not None, "Please provide column"
         assert by is not None, "Please provide by"
 
-        data = to_stack(df, col, by)
+        data, cats = to_stack(df, col, by, transform)
+        if label is None:
+            label = cats
 
     else:
         assert isinstance(df, list), "Please provide DataFrame or List"
@@ -191,7 +224,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
     xaxis = _hist_init(data[0], bins, xrange=range)
 
     y, xaxis, stuff = ax.hist(data, xaxis, histtype='stepfilled',
-                          lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, *args, **kwargs)
+                          lw=lw, color=color, edgecolor=edgecolor, stacked=True, weights=weights, label=label, *args, **kwargs)
 
     TheManager.Instance().set_x_axis(xaxis)
 
@@ -343,3 +376,28 @@ bbox_inches='tight',
     plt.subplots_adjust(bottom=bottom, left=left, right=right, top=top)
     plt.savefig(filename,  *args, **kwargs)
 
+
+def profile(x, y, bins=None, range=None, fmt='.', *args, **kwargs):
+    """ Profile plot of x vs y; the mean and std of y in bins of x as errorbar
+
+    Args:
+        x:
+        y:
+        bins:
+        range:
+        fmt:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    import scipy
+
+    xaxis = _hist_init(x, bins, xrange=range)
+
+    means = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic='mean').statistic
+    std = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic=scipy.stats.sem).statistic
+
+    bin_centers = (xaxis[:-1] + xaxis[1:]) / 2.
+    return plt.errorbar(x=bin_centers, y=means, yerr=std, linestyle='none', fmt=fmt, *args, **kwargs)

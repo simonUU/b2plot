@@ -108,7 +108,7 @@ def set_style():
     plt.subplots_adjust(left=0.15, right=0.92, top=0.92, bottom=0.15)
 
 
-def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True, *args, **kwargs):
+def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True, overwrite=None, *args, **kwargs):
 
     br_open = ''
     br_close = ''
@@ -125,6 +125,13 @@ def labels(xlabel=None, ylabel=None, unit=None, root_style=False, brackets=True,
     if root_style:
         ha = 'right'
         x, y = 1, 1
+
+    if overwrite is not None:
+        if xlabel in overwrite:
+            try:
+                xlable = overwrite[xlabel]
+            except:
+                pass
 
     if xlabel is not None:
         plt.xlabel(xlabel, horizontalalignment=ha, x=x, *args, **kwargs)

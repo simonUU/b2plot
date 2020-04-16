@@ -6,7 +6,7 @@ import b2plot
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from .functions import _hist_init, to_stack, hist, xlim
+from .functions import _hist_init, to_stack, hist, xlim, get_xaxis
 
 
 def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
@@ -21,8 +21,6 @@ def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
         percent_step:
 
     """
-
-
 
     if ax is None:
         fix, ax = plt.subplots()
@@ -41,18 +39,6 @@ def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
         y /= orig
         ax.fill_between(bin_center, tmp, y, color=colormap(quantil/100.0))
         tmp = y
-
-
-def profile(x, y, bins=None, range=None, fmt='.', *args, **kwargs):
-    import scipy
-
-    xaxis = _hist_init(x, bins, xrange=range)
-
-    means = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic='mean').statistic
-    std = scipy.stats.binned_statistic(x, y, bins=xaxis, statistic=scipy.stats.sem).statistic
-
-    bin_centers = (xaxis[:-1] + xaxis[1:]) / 2.
-    plt.errorbar(x=bin_centers, y=means, yerr=std, linestyle='none', fmt=fmt, *args, **kwargs)
 
 
 def ratio(y1, y2, y1_err=None, y2_err= None):
@@ -101,12 +87,18 @@ def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
         ax0.yaxis.set_label_coords(-0.08, 0.5)
 
 
+def mask_append(xs,xb):
+    """ Merge xs and xb into one vector and return it with a boolean mask for each category
+    """
+    return np.append(xs,xb), np.append(np.ones(len(xs)), np.zeros(len(xb)))==1
+
+
 def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=None):
     """ Plots the distribution x in an equal frequency binning with the purity regarding mask
 
     Args:
-        x: Distribution
-        mask:
+        x: Distribution or signal distribution
+        mask: Boolean mask or background distribution
         nbins:
         do_plot:
         figsize:
@@ -115,6 +107,10 @@ def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=N
     Returns:
 
     """
+    if len(pd.unique(mask)) > 2:
+        # if signal and background distribution are given as x and mask
+        x, mask = mask_append(x, mask)
+
     x = x[np.isfinite(x)]
     bins = np.percentile(x, np.linspace(0, 100, nbins))
 
@@ -130,8 +126,8 @@ def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=N
         x_centers = (x_[1:] + x_[:-1]) / 2.
 
         fig, ax = plt.subplots(figsize=figsize)
+        ax.hist(x_[:-1], x_, weights=y_1, alpha=0.8)
         ax.hist(x_[:-1], x_, weights=y_0, histtype='step', lw=2)
-        ax.hist(x_[:-1], x_, weights=y_1, )
         ax.hist(x_[:-1], x_, weights=y_, histtype='step', color='grey')
 
         ax2 = ax.twinx()
@@ -151,14 +147,28 @@ def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=N
     return pur, np.sqrt(pur_err), bins
 
 
+def flat_bins(x, set=False, nbins=None,  fontsize=None, rotation=-90):
+    if nbins is None:
+        nbins = len(get_xaxis())-1
+    bins = np.percentile(x, np.linspace(0, 100, nbins+1))
+    np.append(bins, x.max())
+    if set:
+        ax = plt.gca()
+        x_ = np.linspace(0, 110, len(bins)+1)
+        _ = ax.set_xticks(x_)
+        _ = ax.set_xticklabels(['%1.2e' % f for f in bins], rotation=rotation, fontfamily='monospace',
+                    fontsize=fontsize)
+    else:
+        return bins, np.linspace(0, 100, len(bins)+1)
+
 def purity_flatness_proba(x, mask, nbins=10, do_plot=False):
     """ Returns the probability that the purity of x[mask] and x[~mask] is flat.
 
     This can be used as a measure of the information content in this observable regarding the mask.
 
     Args:
-        x: Observable
-        mask: Boolean mask, like 'is signal', 'is background'
+        x: Observable or signal distribution
+        mask: Boolean mask, like 'is signal', 'is background' or background distribution
         nbins: Number of bins to calculate the purity
         do_plot (bool): plot the purity distribution
 
@@ -167,6 +177,14 @@ def purity_flatness_proba(x, mask, nbins=10, do_plot=False):
         with a flat distribution.
 
     """
+
+    if len(pd.unique(mask)) > 2:
+        # if signal and background distribution are given as x and mask
+        x, mask = mask_append(x, mask)
+    
+    if np.std(x)==0:
+        return 1
+
     pur, pure, b = purity_hist(x, mask, nbins=nbins, do_plot=do_plot)
 
     mask = (np.isfinite(pur)) & (pur != 0)
