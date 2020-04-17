@@ -13,39 +13,6 @@ from matplotlib.colors import hex2color
 import matplotlib.pyplot as plt
 
 
-def _hist_init(data, bins=None, xrange=None):
-    """ Performs and stores or returns the binning
-
-    Args:
-        data:
-        bins:
-        xrange:
-
-    Returns:
-
-    """
-    xaxis = TheManager.Instance().get_x_axis()
-
-    if xaxis is None or bins is not None or xrange is not None:
-        if bins is None:
-            bins = get_optimal_bin_size(len(data))
-        _, xaxis = np.histogram(data, bins, xrange)
-
-    return xaxis
-
-
-def set_xaxis(bins, flat=False):
-    TheManager.Instance().set_x_axis(bins)
-
-
-def get_xaxis():
-    return TheManager.Instance().get_x_axis()
-
-
-def flat_x(x, nbins=25):
-    set_xaxis(np.percentile(x, np.linspace(0, 100, nbins)))
-
-
 def text(t, x=0.8, y=0.9, fontsize=22, *args, **kwargs):
     """
 
