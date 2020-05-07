@@ -259,9 +259,11 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
                 weights *= scale
         else:
             print("Please provide int or float with scale")
-
+    else:
+        scale = 1
+        
     y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
-    err = (-0.5 + np.sqrt(np.array(y + 0.25)), +0.5 + np.sqrt(np.array(y + 0.25)))  # np.sqrt(np.array(y))
+    err = (-0.5 + np.sqrt(np.array(y*scale + 0.25)), +0.5 + np.sqrt(np.array(y*scale + 0.25)))  # np.sqrt(np.array(y))
     bin_centers = (x[1:] + x[:-1]) / 2.0
 
     if isinstance(color, int):

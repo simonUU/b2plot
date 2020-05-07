@@ -6,7 +6,14 @@ import b2plot
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from .functions import _hist_init, to_stack, hist, xlim, get_xaxis
+from .histogram import _hist_init, to_stack, hist, get_xaxis
+from .functions import xlim
+
+
+def optimal_bin_size(n):
+    """ Is this empricially the best?
+    """
+    return int(2*n**(1/3))
 
 
 def plot_flatness(sig, tag, bins=None, ax=None, xrange=None, percent_step=5):
@@ -93,7 +100,24 @@ def mask_append(xs,xb):
     return np.append(xs,xb), np.append(np.ones(len(xs)), np.zeros(len(xb)))==1
 
 
-def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=None):
+def pur_eff_cont(x, mask):
+    """ Continuus evaluation of the purity vs efficiency 
+
+    Returns:
+        efficiency, purity : arrays of len(x)
+    """
+    if len(pd.unique(mask)) > 2:
+        # if signal and background distribution are given as x and mask
+        x, mask = mask_append(x, mask)
+
+    ag = np.argsort(np.array(x))[::-1]
+    e = mask[ag].cumsum() 
+    eff = e/e[-1]
+    pur = e/np.arange(1,len(mask)+1)
+    return eff, pur 
+
+
+def pur_eff(x, mask, nbins=None, reverse_too=False):
     """ Plots the distribution x in an equal frequency binning with the purity regarding mask
 
     Args:
@@ -111,6 +135,8 @@ def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=N
         # if signal and background distribution are given as x and mask
         x, mask = mask_append(x, mask)
 
+    nbins = optimal_bin_size(len(x)) if nbins is None else nbins
+
     x = x[np.isfinite(x)]
     bins = np.percentile(x, np.linspace(0, 100, nbins))
 
@@ -119,16 +145,74 @@ def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=N
     y_0, _ = np.histogram(x[~mask], bins)
 
     pur = y_1 / (y_1 + y_0)
-    pur_err = (pur * (1 - pur)) / (y_)
+    ps = np.argsort(pur)
+    # pur_err = (pur * (1 - pur)) / (y_)  
+
+    # Sort by purity
+    y1 = y_1[ps]
+    y0 = y_0[ps]
+    y = y_[ps]
+
+    eff = sum(y1)-y1.cumsum()
+    eff_err = np.sqrt(eff)/eff[0] #faster than np.sum(y_1)
+    eff = eff/eff[0]
+
+    pur= (y1[::-1].cumsum()/(y1[::-1].cumsum()+y0[::-1].cumsum()))[::-1]
+    pur_err = (pur * (1 - pur)) / (y)  
+
+    if reverse_too:
+        eff_r = sum(y1)-y1[::-1].cumsum()
+        eff_r_err = np.sqrt(eff_r)/eff_r[0]
+        eff_r = eff_r/eff_r[0]    
+
+        pur_r= (y1.cumsum()/(y1.cumsum()+y0.cumsum()))[::-1]
+        pur_r_err = (pur_r * (1 - pur_r)) / (y)  
+
+        eff = np.append(eff, eff_r[::-1])
+        pur = np.append(pur, pur_r[::-1])
+        eff_err = np.append(eff_err, eff_r_err[::-1])
+        pur_err = np.append(pur_err, pur_r_err[::-1])
+    return eff, pur,pur_err, eff_err
+
+
+def purity_hist(x, mask, nbins=10, do_plot=True, figsize=None, xticks_fontsize=None, ax=None):
+    """ Plots the distribution x in an equal frequency binning with the purity regarding mask
+
+    Args:
+        x: Distribution or signal distribution
+        mask: Boolean mask or background distribution
+        nbins:
+        do_plot:
+        figsize:
+        xticks_fontsize:
+        ax:
+
+    Returns:
+
+    """
+    if len(pd.unique(mask)) > 2:
+        # if signal and background distribution are given as x and mask
+        x, mask = mask_append(x, mask)
+
+    x = x[np.isfinite(x)]
+    bins = np.percentile(x, np.linspace(0, 100, nbins))
+
+    y_, _ = np.histogram(x, bins)
+    y_1, _ = np.histogram(x[mask], bins)
+    y_0, _ = np.histogram(x[~mask], bins)
+
+    pur = y_1 / (y_1 + y_0)
+    pur_err = (pur * (1 - pur)) / (y_)    
 
     if do_plot:
         x_ = np.arange(len(y_) + 1)
         x_centers = (x_[1:] + x_[:-1]) / 2.
 
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.hist(x_[:-1], x_, weights=y_1, alpha=0.8)
-        ax.hist(x_[:-1], x_, weights=y_0, histtype='step', lw=2)
-        ax.hist(x_[:-1], x_, weights=y_, histtype='step', color='grey')
+        if ax is None:
+            _, ax = plt.subplots(figsize=figsize)
+        ax.hist(x_[:-1], x_, weights=y_1, alpha=0.8, label='Signal')
+        ax.hist(x_[:-1], x_, weights=y_0, histtype='step', lw=2, label='Background')
+        ax.hist(x_[:-1], x_, weights=y_, histtype='step', color='grey', label='Total')
 
         ax2 = ax.twinx()
         ax2.errorbar(x_centers, pur, np.sqrt(pur_err), color='black', fmt="o--")
@@ -234,8 +318,13 @@ def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, 
            x_bkg = df[col][~by].values
     # Alternative usage, passing two arrays
     else:
-        x_sig = df
-        x_bkg = col
+        if len(pd.unique(col)) == 2:
+            # if signal and background distribution are given as x and mask
+            x_sig = df[col]
+            x_bkg = df[~col]
+        else:
+            x_sig = df
+            x_bkg = col
 
     xaxis = _hist_init(np.append(x_sig, x_bkg), bins, xrange=range)
 
@@ -247,3 +336,55 @@ def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, 
 
     plt.legend()
     xlim()
+
+
+def get_upper_lim(x, perc=0.1, width=1, maxtries=100):
+    xmax = np.max(x)
+    xstd = width*np.std(x)
+    if xstd == 0:
+        return xmax
+    lx = len(x)
+    cut = xmax
+    i = 0
+    while i<maxtries:
+        cut -= xstd
+        px = 100*len(x[x>cut])/lx
+        if px>=perc:
+            cut+=xstd
+            break
+        i+=1
+    return cut
+
+
+def get_lower_lim(x, perc=0.1, width=1, maxtries=100):
+    xmin = np.min(x)
+    xstd = width*np.std(x)
+    if xstd == 0:
+        return xmin
+    lx = len(x)
+    cut = xmin
+    i = 0
+    while i<maxtries:
+        cut += xstd
+        px = 100*len(x[x<cut])/lx
+        if px>=perc:
+            cut-=xstd
+            break
+        
+    return cut
+
+
+def minmax(x,perc=0.1, width=1, maxtries=100):
+    return (get_lower_lim(x, perc, width, maxtries), get_upper_lim(x, perc, width, maxtries))
+
+
+def plot_feature_importance(imp, cols, figsize=None, palette='Blues_d',ax=None, *args, **kwargs):
+    if ax is None:
+        plt.figure(figsize=figsize)
+        ax = plt.gca()
+    imp = np.argsort(fi)[::-1]
+    dfplot= pd.DataFrame({'col':np.array(cols)[imp], 'imp':fi[imp]})
+    sns.barplot('imp', 'col', data=dfplot, hue_order=fi[imp][::-1], palette=palette, ax=ax, *args, **kwargs )
+    ax.set_xlabel("Importance",)
+    ax.set_ylabel("Feature",)
+    return np.array(cols)[imp]
