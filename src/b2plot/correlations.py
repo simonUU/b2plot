@@ -14,7 +14,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45):
+def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45, invert_y=True, draw_labels=True, get_im=False):
     """ Calculate and plot a 2D correlation in flat binning.
     This function calculates an equal frequency binning for x and y and fills a 2D histogram with this binning.
     Thus each slice in x and y contains the same number of entries for continuus distributions.
@@ -34,31 +34,57 @@ def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e
     Returns:
         chi2 probability for flat distribution
     """
+
+    not_on_axes = True if ax is None else False
     ax = plt.gca() if ax is None else ax
     
     # calculate equal fequrency binning
     nbins = 2*(3*len(x)**(1/3))**(1/2) if nbins=='auto' else nbins
-    binsx = np.percentile(x, np.linspace(0,100, nbins))
-    binsy = np.percentile(y, np.linspace(0,100, nbins))
+    binsx = pd.unique(np.percentile(x, np.linspace(0,100, nbins)))
+    binsy = pd.unique(np.percentile(y, np.linspace(0,100, nbins)))
     # Bin count
     bs = binned_statistic_2d(x, y, None, statistic='count', bins=[binsx,binsy])
     # Calculate actual count - expected significance
-    nexp = len(x)/(nbins-1)**2
-    nerr = np.sqrt(nexp)
+    nexp_total = len(x)/((nbins-1)**2)
+
     a0 = bs.statistic.T
-    a = np.array(a0)
-    a = (a - nexp)/nerr
+
+    m1 = a0.sum(axis=1)/(a0.shape[1])
+    m1 /= np.min(m1)
+    m0 = a0.sum(axis=0)/(a0.shape[0])
+    m0 /= np.min(m0)
+    
+    beta = np.full( a0.shape, nexp_total)
+    m_exp = (beta.T*(m1).astype(int)).T*(m0).astype(int)
+    m_stat = m_exp**0.5
+    
+    a = (a0-m_exp)/m_stat
+
     a[a0==0] = None
     # Plotting
     im = ax.imshow(a, cmap=plt.cm.jet, interpolation='nearest', origin='lower',vmin=-5*zoom, vmax=5*zoom)
-    cbar = plt.colorbar(im,fraction=0.046, pad=0.04, ax=ax)
     # set labels
-    ax.set_xticks(np.linspace(*ax.get_xlim(), nlabels))
-    ax.set_xticklabels([ax_fmt%f for f in np.percentile(x, np.linspace(0,100, nlabels))], rotation=x_label_rot, ha='right')
-    ax.set_yticks(np.linspace(*ax.get_ylim(), nlabels))
-    ax.set_yticklabels([ax_fmt%f for f in np.percentile(y, np.linspace(0,100, nlabels))]) 
+    if draw_labels:
+        cbar = plt.colorbar(im,fraction=0.046, pad=0.04, ax=ax)
+        ax.set_xticks(np.linspace(*ax.get_xlim(), nlabels))
+        ax.set_xticklabels([ax_fmt%f for f in np.percentile(x, np.linspace(0,100, nlabels))], rotation=x_label_rot, ha='right')
+        ax.set_yticks(np.linspace(*ax.get_ylim(), nlabels))
+        ax.set_yticklabels([ax_fmt%f for f in np.percentile(y, np.linspace(0,100, nlabels))]) 
+        if isinstance(x,pd.Series):
+            ax.set_xlabel(x.name)
+        if isinstance(y,pd.Series):
+            ax.set_ylabel(y.name)   
+    else:
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
     # Calculate chi2 probability
     flat_probability = stats.distributions.chi2.sf(np.nansum(a*a),(nbins)**2-(nbins-1)-(nbins-1)-1)
+
+    if invert_y:
+        ax.invert_yaxis()
+
+    if get_im:
+        return im
     return  flat_probability
 
 
@@ -230,3 +256,115 @@ def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font
     if separate_first > 0:    
         plt.axhline(separate_first, color='gray',lw=1)
         plt.axvline(separate_first, color='gray',lw=1)
+
+
+ def flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None,
+                              labelsize=14, size=12, n_labels=3, fontsize=22, draw_cbar=False,
+                              tick_label_rotation=45, formatter='%.2e',label_rotatation=None):
+    """ Draws a flat correlation matrix of df
+
+    Args:
+        df:
+        pdf:
+        tight:
+        col_numbers:
+        labels:
+        labelsize:
+        size:
+        n_labels:
+        fontsize:
+        draw_cbar:
+        rotation:
+        formatter:
+
+    Returns:
+
+    """
+
+    assert isinstance(df, pd.DataFrame), 'Argument of wrong type! Needs pd.DataFrame'
+
+    n_vars = np.shape(df)[1]
+
+    if labels is None:
+        labels = df.columns
+    im = None
+    fig, axes = plt.subplots(nrows=n_vars, ncols=n_vars, figsize=(size, size))
+
+    # Plotting the matrix, iterate over the columns in 2D
+    for i, row in zip(range(n_vars), axes):
+        for j, ax in zip(range(n_vars), row):
+            if i is j - 1000:
+                plt.sca(ax)
+                ax.hist(df.iloc[:, i].values, label='data', color='gray')
+                ax.set_yticklabels([])
+            else:
+                im = flat_correlation(df.iloc[:, j], df.iloc[:, i], ax=ax, draw_labels=False, get_im=True)
+
+    if tight:
+        plt.tight_layout()
+
+    # Common outer label
+    for i, row in zip(range(n_vars), axes):
+        for j, ax in zip(range(n_vars), row):
+            if i == n_vars - 1:
+                set_flat_labels(ax, df.iloc[:, j], axis=1, n_labels=n_labels, labelsize=labelsize,
+                                rotation=90 if tick_label_rotation is 0 else tick_label_rotation, formatter=formatter)
+                if col_numbers:
+                    ax.set_xlabel("%d" % j)
+                else:
+                    ax.set_xlabel(labels[j], fontsize=fontsize, rotation = label_rotatation)
+            if j == 0:
+                set_flat_labels(ax, df.iloc[:, i], axis=0, n_labels=n_labels, labelsize=labelsize,
+                                rotation=tick_label_rotation, formatter=formatter)
+                if col_numbers:
+                    ax.set_ylabel("%d" % i)
+                else:
+                    ax.set_ylabel(labels[i], fontsize=fontsize, rotation =label_rotatation)
+
+    if pdf is None:
+        # plt.show()
+        pass
+    else:
+        pdf.savefig()
+        plt.close()
+
+    if draw_cbar:
+        cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
+        cbar = plt.colorbar(im, cax=cbar_ax, )
+        cbar.ax.set_ylabel('$\sigma$', rotation=0, fontsize=fontsize, va='center')
+        cbar.ax.tick_params(labelsize=labelsize)
+        
+
+def set_flat_labels(ax, x, n_labels=5, axis=1, labelsize=12, rotation=45,
+                    formatter='%.3e'):
+    """ Helper function to draw the correct x-labels to a flat plot
+
+    Args:
+        ax:
+        x:
+        n_labels:
+        axis:
+        labelsize:
+        rotation:
+        formatter:
+
+    Returns:
+
+    """
+
+    start, end = ax.get_xlim() if axis == 1 else ax.get_ylim()
+
+    label_position = np.linspace(start, end, n_labels)
+
+    # print label_position
+    new_labels = np.percentile(x, np.linspace(0, 100, n_labels))
+
+    # print new_labels
+    if axis is 1:
+        ha = 'center' if rotation != 0 else 'right'
+        ax.set_xticks(label_position)
+        ax.set_xticklabels([formatter % i for i in new_labels], fontsize=labelsize, rotation=rotation, ha=ha)
+    else:
+        ha = 'center' if rotation == 0 else 'top'
+        ax.set_yticks(label_position)
+        ax.set_yticklabels([formatter % i for i in new_labels], fontsize=labelsize, rotation=rotation, va=ha)
