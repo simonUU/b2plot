@@ -258,9 +258,8 @@ def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font
         plt.axvline(separate_first, color='gray',lw=1)
 
 
- def flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None,
-                              labelsize=14, size=12, n_labels=3, fontsize=22, draw_cbar=False,
-                              tick_label_rotation=45, formatter='%.2e',label_rotatation=None):
+def flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None, labelsize=14, size=12, n_labels=3, 
+                     fontsize=22, draw_cbar=False,  tick_label_rotation=45, formatter='%.2e',label_rotatation=None):
     """ Draws a flat correlation matrix of df
 
     Args:
@@ -312,14 +311,14 @@ def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font
                 if col_numbers:
                     ax.set_xlabel("%d" % j)
                 else:
-                    ax.set_xlabel(labels[j], fontsize=fontsize, rotation = label_rotatation)
+                    ax.set_xlabel(labels[j], fontsize=fontsize)
             if j == 0:
                 set_flat_labels(ax, df.iloc[:, i], axis=0, n_labels=n_labels, labelsize=labelsize,
                                 rotation=tick_label_rotation, formatter=formatter)
                 if col_numbers:
                     ax.set_ylabel("%d" % i)
                 else:
-                    ax.set_ylabel(labels[i], fontsize=fontsize, rotation =label_rotatation)
+                    ax.set_ylabel(labels[i], fontsize=fontsize)
 
     if pdf is None:
         # plt.show()

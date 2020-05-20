@@ -8,6 +8,7 @@ from .analysis import sig_bkg_plot
 from .helpers import xaxis, nf, figure
 from .decorations import draw_y_label, decorate, expand, watermark, lumi, labels, text
 from .colors import cm, b2helix
+from .correlations import float_correlation
 
 import matplotlib as mpl
 # mpl.rcParams['mathtext.fontset'] = 'cm'
