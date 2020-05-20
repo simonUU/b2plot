@@ -378,10 +378,11 @@ def minmax(x,perc=0.1, width=1, maxtries=100):
     return (get_lower_lim(x, perc, width, maxtries), get_upper_lim(x, perc, width, maxtries))
 
 
-def plot_feature_importance(imp, cols, figsize=None, palette='Blues_d',ax=None, *args, **kwargs):
+def plot_feature_importance(fi, cols, figsize=None, palette='Blues_d',ax=None, *args, **kwargs):
     if ax is None:
         plt.figure(figsize=figsize)
         ax = plt.gca()
+    import seaborn as sns
     imp = np.argsort(fi)[::-1]
     dfplot= pd.DataFrame({'col':np.array(cols)[imp], 'imp':fi[imp]})
     sns.barplot('imp', 'col', data=dfplot, hue_order=fi[imp][::-1], palette=palette, ax=ax, *args, **kwargs )

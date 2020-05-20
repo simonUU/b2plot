@@ -263,6 +263,8 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
         scale = 1
         
     y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
+    
+    # https://www-cdf.fnal.gov/physics/statistics    
     err = (-0.5 + np.sqrt(np.array(y*scale + 0.25)), +0.5 + np.sqrt(np.array(y*scale + 0.25)))  # np.sqrt(np.array(y))
     bin_centers = (x[1:] + x[:-1]) / 2.0
 
@@ -272,7 +274,6 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
     if color is None:
         color = next(ax._get_lines.prop_cycler)["color"]
 
-    # https://www-cdf.fnal.gov/physics/statistics
     if normed:
         yom, x = np.histogram(data, xaxis, weights=weights)
         err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
