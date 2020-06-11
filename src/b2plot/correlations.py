@@ -14,7 +14,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45, invert_y=True, draw_labels=True, get_im=False):
+def float_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45, invert_y=True, draw_labels=True, get_im=False):
     """ Calculate and plot a 2D correlation in flat binning.
     This function calculates an equal frequency binning for x and y and fills a 2D histogram with this binning.
     Thus each slice in x and y contains the same number of entries for continuus distributions.
@@ -258,7 +258,7 @@ def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font
         plt.axvline(separate_first, color='gray',lw=1)
 
 
-def flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None, labelsize=14, size=12, n_labels=3, 
+def float_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None, labelsize=14, size=12, n_labels=3, 
                      fontsize=22, draw_cbar=False,  tick_label_rotation=45, formatter='%.2e',label_rotatation=None):
     """ Draws a flat correlation matrix of df
 
