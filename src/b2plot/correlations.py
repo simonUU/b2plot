@@ -14,7 +14,7 @@ import pandas as pd
 import seaborn as sns
 
 
-def float_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45, invert_y=True, draw_labels=True, get_im=False):
+def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e', x_label_rot=45, invert_y=True, draw_labels=True, get_im=False):
     """ Calculate and plot a 2D correlation in flat binning.
     This function calculates an equal frequency binning for x and y and fills a 2D histogram with this binning.
     Thus each slice in x and y contains the same number of entries for continuus distributions.
