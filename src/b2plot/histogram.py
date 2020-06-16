@@ -205,6 +205,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
                     if not isinstance(scale, bool):
                         wei *= scale
                 elif isinstance(scale, list):
+                    print(len(scale), len(data))
                     assert len(scale)!=len(data), "Scale list must have same lenght as data"
                     wei *= scale[i]
                 else:

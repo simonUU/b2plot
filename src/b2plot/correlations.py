@@ -258,7 +258,7 @@ def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font
         plt.axvline(separate_first, color='gray',lw=1)
 
 
-def float_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None, labelsize=14, size=12, n_labels=3, 
+def flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=None, labelsize=14, size=12, n_labels=3, 
                      fontsize=22, draw_cbar=False,  tick_label_rotation=45, formatter='%.2e',label_rotatation=None):
     """ Draws a flat correlation matrix of df
 
