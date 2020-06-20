@@ -198,12 +198,15 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     if weights is None:
         weights = []
-        for d in data:
+        for i,d in enumerate(data):
             wei = np.ones(len(d))
             if scale is not None:
                 if isinstance(scale, int) or isinstance(scale, float):
                     if not isinstance(scale, bool):
                         wei *= scale
+                elif isinstance(scale, dict):
+                    assert cats[i] in scale.keys(), "Scale list must have same lenght as data"
+                    wei *= scale[cats[i]]
                 else:
                     print("Please provide int or float with scale")
             weights.append(wei)
