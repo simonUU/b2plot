@@ -203,12 +203,15 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
 
     if weights is None:
         weights = []
-        for d in data:
+        for i,d in enumerate(data):
             wei = np.ones(len(d))
             if scale is not None:
                 if isinstance(scale, int) or isinstance(scale, float):
                     if not isinstance(scale, bool):
                         wei *= scale
+                elif isinstance(scale, dict):
+                    assert cats[i] in scale.keys(), "Scale list must have same lenght as data"
+                    wei *= scale[cats[i]]
                 else:
                     print("Please provide int or float with scale")
             weights.append(wei)
@@ -222,7 +225,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
     return y[-1], xaxis, stuff  # dangerous list index
 
 
-def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, scale=None,
+def errorhist(data, bins=None, color=None, normed=False, density=False, fmt='.', range=None, scale=None,
               x_err=False, box=False, ax=None, weights=None, plot_zero=True, label=None, *args, **kwargs):
     """ Histogram as error bar
 
@@ -231,6 +234,7 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
         bins:
         color:
         normed:
+        density:
         fmt:
         range:
         scale:
@@ -266,9 +270,13 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
             print("Please provide int or float with scale")
     else:
         scale = 1
-        
-    y, x = np.histogram(data, xaxis, normed=normed, weights=weights)
-    
+
+    if (normed and density) or normed:
+      print('normed is deprecated and changed by density. Your call has been changed to density=True automatically.')
+      density=True
+
+    y, x = np.histogram(data, xaxis, density=density, weights=weights)
+
     # https://www-cdf.fnal.gov/physics/statistics    
     err = (-0.5 + np.sqrt(np.array(y*scale + 0.25)), +0.5 + np.sqrt(np.array(y*scale + 0.25)))  # np.sqrt(np.array(y))
     bin_centers = (x[1:] + x[:-1]) / 2.0
@@ -279,7 +287,7 @@ def errorhist(data, bins=None, color=None, normed=False, fmt='.', range=None, sc
     if color is None:
         color = next(ax._get_lines.prop_cycler)["color"]
 
-    if normed:
+    if density:
         yom, x = np.histogram(data, xaxis, weights=weights)
         err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
     if x_err is not False or box:
