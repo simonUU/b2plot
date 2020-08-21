@@ -69,6 +69,22 @@ def ratio(y1, y2, y1_err=None, y2_err= None):
     return r, re
 
 
+def divhist(h1,h2):
+#     np.mean(hebg[2], axis=0)
+    assert np.mean(h1[1]-h2[1]) < 0.1
+    r,re = ratio(h1[0],h2[0], np.mean(h1[2], axis=0),np.mean(h2[2], axis=0) )
+    return r, h1[1], [re,re]
+
+
+def subhist(h1,h2, rethist=False):
+    assert np.mean(h1[1]-h2[1]) < 0.1
+    r = h1[0] - h2[0]
+    re = np.sqrt(np.mean(h1[2], axis=0)**2 + np.mean(h2[2], axis=0)**2)
+    if rethist:
+        return r,h1[1],  [re,re]
+    return h1[1],r, [re,re]
+
+
 def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
                   y_label=None, figsize=None, ratio_range=(0, 2),
                   *args, **kwarg):
@@ -245,6 +261,7 @@ def flat_bins(x, set=False, nbins=None,  fontsize=None, rotation=-90):
     else:
         return bins, np.linspace(0, 100, len(bins)+1)
 
+
 def purity_flatness_proba(x, mask, nbins=10, do_plot=False):
     """ Returns the probability that the purity of x[mask] and x[~mask] is flat.
 
@@ -285,6 +302,11 @@ def purity_flatness_proba(x, mask, nbins=10, do_plot=False):
         return chi2
 
 
+
+def df_var_by2xy():
+    pass
+
+
 def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, normed=False):
     """
 
@@ -306,12 +328,18 @@ def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, 
     if isinstance(df, pd.DataFrame):
         # by is not a boolean index
         if isinstance(by, str):
-            x = to_stack(df, col, by)
+            x, cats = to_stack(df, col, by, get_cats=True)
             if len(x) > 2 :
                 print("Waring, more than two categories in %s!" % by)
                 assert len(x) > 1, "Did not found any categories in %s!" % by
-            x_sig = x[1]
-            x_bkg = x[0]
+
+            x_sig = x[0]
+            x_bkg = x[1]
+
+            if len(cats) == 2:
+                if labels is None:
+                    labels = [by+f' == {cats[1]}', by+f' == {cats[0]}']
+
         # by is a boolean index
         else:
            x_sig = df[col][by].values
@@ -335,7 +363,7 @@ def sig_bkg_plot(df, col, by=None, ax=None, bins=None, range=None, labels=None, 
     hist(x_sig, xaxis, lw=2, color=0, label=labels[1], ax=ax, density=normed)
 
     plt.legend()
-    xlim()
+    # xlim()
 
 
 def get_upper_lim(x, perc=0.1, width=1, maxtries=100):

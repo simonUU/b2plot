@@ -30,6 +30,9 @@ def _hist_init(data, bins=None, xrange=None):
     if xaxis is None or bins is not None or xrange is not None:
         if bins is None:
             bins = get_optimal_bin_size(len(data))
+        if xrange == 'auto':
+            from .analysis import minmax
+            xrange = minmax(data)
         _, xaxis = np.histogram(data, bins, xrange)
 
     return xaxis
@@ -131,7 +134,7 @@ def _notransform(x):
     return x
 
 
-def to_stack(df, col, by, transform=None):
+def to_stack(df, col, by, transform=None, get_cats=False):
     """ Convert columns of a dataframe to a list of lists by 'by'
 
     Args:
@@ -154,7 +157,9 @@ def to_stack(df, col, by, transform=None):
     inds = x_len.argsort()
     # print(cats)
     # print(inds)
-    return [x_data[i] for i in inds], cats[inds]
+    if get_cats:
+        return [x_data[i] for i in inds], cats[inds]
+    return [x_data[i] for i in inds]
 
 
 def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=None, edgecolor='black', weights=None,
@@ -179,7 +184,7 @@ def stacked(df, col=None, by=None, bins=None, color=None, range=None, lw=.5, ax=
         assert col is not None, "Please provide column"
         assert by is not None, "Please provide by"
 
-        data, cats = to_stack(df, col, by, transform)
+        data, cats = to_stack(df, col, by, transform, get_cats=True)
         if label is None:
             label = cats
 
@@ -332,7 +337,7 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
         hi = y_err[0] + y_err[1]
         lo = y - y_err[0]
         ax.errorbar(bin_centers, y, color=color, xerr=x_err, fmt=' ')
-        ax.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=.7,
+        ax.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color,
                 width=2 * x_err, label=label,
                 edgecolor=color, *args, **kwargs)
     else:
