@@ -289,8 +289,7 @@ def errorhist(data, bins=None, color=None, normed=False, density=False, fmt='.',
 
     if density:
         yom, x = np.histogram(data, xaxis, weights=weights)
-        with np.errstate(divide='ignore',invalid='ignore'):
-          err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
+        err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
     if x_err is not False or box:
         x_err = (x[1]-x[0])/2.0
     else:
