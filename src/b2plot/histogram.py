@@ -289,7 +289,8 @@ def errorhist(data, bins=None, color=None, normed=False, density=False, fmt='.',
 
     if density:
         yom, x = np.histogram(data, xaxis, weights=weights)
-        err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
+        with np.errstate(divide='ignore',invalid='ignore'):
+          err = (np.sqrt(np.array(yom)) *(y/yom), np.sqrt(np.array(yom)) * (y/yom))
     if x_err is not False or box:
         x_err = (x[1]-x[0])/2.0
     else:
@@ -303,7 +304,7 @@ def errorhist(data, bins=None, color=None, normed=False, density=False, fmt='.',
 
 
 def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='.',
-             color=None, ax=None, label=None, *args, **kwargs):
+             color=None, ax=None, label=None, alpha=0.4, hatch=None, *args, **kwargs):
     """ Error graph plotting x-y points with errorbars
 
     Args:
@@ -317,6 +318,8 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
         color:
         ax:
         label:
+        alpha:
+        hatch:
         *args:
         **kwargs:w
     """
@@ -345,9 +348,9 @@ def errorbar(bin_centers, y, y_err, x_err=None, box=False, plot_zero=True, fmt='
         hi = y_err[0] + y_err[1]
         lo = y - y_err[0]
         ax.errorbar(bin_centers, y, color=color, xerr=x_err, fmt=' ')
-        ax.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color,
+        ax.bar(bin_centers[toplot], hi, bottom=lo, align='center', color=color, alpha=alpha,
                 width=2 * x_err, label=label,
-                edgecolor=color, *args, **kwargs)
+                edgecolor=color, hatch=hatch,*args, **kwargs)
     else:
         ax.errorbar(bin_centers, y, yerr=y_err, xerr=x_err, fmt=fmt, color=color,label=label, *args, **kwargs)
 
