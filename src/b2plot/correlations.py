@@ -15,24 +15,24 @@ import seaborn as sns
 
 
 def corrmatrix(corr, separate_first=0, x_label_rot=45, invert_y=True, label_font_size=None, ax=None, *args, **kwargs):
-    """ 
+    """
     Recommendation:
-    
-        with plt.style.context(['default','seaborn-bright']):  
+
+        with plt.style.context(['default','seaborn-bright']):
             corrmatrix(corrm_s,separate_first=2)
     """
     ax = plt.gca() if ax is None else ax
-    
+
     sns.heatmap(corr, annot=False, cmap='PiYG',square=True, vmax=1,vmin=-1, *args, **kwargs)
     plt.ylim(*plt.xlim())
-    
+
     plt.gca().set_xticklabels(plt.gca().get_xticklabels(), rotation=x_label_rot, horizontalalignment='right', fontsize=label_font_size)
     plt.gca().set_yticklabels(plt.gca().get_yticklabels(), fontsize=label_font_size)
-    
+
     if invert_y:
         plt.gca().invert_yaxis()
 
-    if separate_first > 0:    
+    if separate_first > 0:
         plt.axhline(separate_first, color='gray',lw=1)
         plt.axvline(separate_first, color='gray',lw=1)
 
@@ -62,11 +62,11 @@ def flat_correlation(x,y, nbins='auto', zoom=1, nlabels=5, ax=None, ax_fmt='%.2e
     ax = plt.gca() if ax is None else ax
     
     # calculate equal fequrency binning
-    nbins = int(2*(3*len(x)**(1/3))**(1/2) if nbins=='auto' else nbins)
+    nbins = int(2*(3*len(x)**(1/3))**(1/2)) if nbins=='auto' else nbins
     binsx = pd.unique(np.percentile(x, np.linspace(0,100, nbins)))
     binsy = pd.unique(np.percentile(y, np.linspace(0,100, nbins)))
     # Bin count
-    bs = binned_statistic_2d(x, y, None, statistic='count', bins=[binsx,binsy])
+    bs = binned_statistic_2d(x, y, values=x, statistic='count', bins=[binsx,binsy])
     # Calculate actual count - expected significance
     nexp_total = len(x)/((nbins-1)**2)
 
