@@ -88,6 +88,11 @@ def subhist(h1,h2, rethist=False):
 def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
                   y_label=None, figsize=None, ratio_range=(0, 2),
                   *args, **kwarg):
+    """ Perform data mc distributions
+    
+    returns:
+        axes
+    """
     f, axes = plt.subplots(2, 1, gridspec_kw={"height_ratios": [3, 1]}, sharex=True, figsize=figsize)
     ax0 = axes[0]
 
@@ -108,6 +113,7 @@ def data_mc_ratio(data, mc, label_data='Data', label_mc="MC",
         ax1.set_ylabel("Ratio")
         ax1.yaxis.set_label_coords(-0.08, 0.5)
         ax0.yaxis.set_label_coords(-0.08, 0.5)
+    return axes
 
 
 def mask_append(xs,xb):
