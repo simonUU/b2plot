@@ -79,10 +79,10 @@ def divideEfficiency(n_nom, n_denom, confidence=0.683):
     Args:
         n_nom: y values of nominator histogram (1d or 2d)
         n_denom: y values of denominator histogram  (1d or 2d)
-        confidence: (optional) error of first
+        confidence: (optional) confidence level, by default 0.683
 
     Returns:
-        ratio, [upper ratio error, lower ratio error]
+        ratio, [lower ratio error, upper ratio error]
     """
     shape = np.shape(n_nom)
 
@@ -110,23 +110,22 @@ def exact_CI(k, n, conf=0.683):
     """ calculated clopper pearson confidence intervals
 
     Args:
-        k: 
-        n: y 
-        conf: 
+        k: number of passes ("numerator of proportion")
+        n: total sample size ("denominator of proportion")
+        conf: (optional) confidence level, by default 0.683
 
     Returns:
-        ratio, [upper ratio error, lower ratio error] 
+        ratio, [upper ratio error, lower ratio error]
     """
 
     from scipy.stats import beta
-    from scipy.special import betainc
     k = float(k)
     n = float(n)
-    p = (k/n) if n>0 else 0
+    p = (k/n) if n > 0 else 0
 
     alpha = (1 - conf)
-    up =  1 - beta.ppf(alpha/2,n-k,k+1)
-    down = 1 - beta.ppf(1-alpha/2,n-k+1,k)
+    up = 1 if k == n else 1 - beta.ppf(alpha/2, n-k, k+1)
+    down = 0 if k == 0 else 1 - beta.ppf(1-alpha/2, n-k+1, k)
 
     result = (p, p-down, up-p)
     return result
