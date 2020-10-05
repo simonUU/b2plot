@@ -18,6 +18,7 @@ def test_divideEfficiency():
     res = bp.analysis.divideEfficiency(t,t)
     assert np.mean(res[0]) == 1, "braindead test"
 
+
 def test_divideEfficiency_half():
     t = np.ones(10)
     res = bp.analysis.divideEfficiency(t,t*2)
