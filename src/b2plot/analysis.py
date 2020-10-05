@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """ Analysis tools
 
+Author:
+    - Simon Wehle (swehle@desy.de)
+    - Henrikas Svidras (henrikas.svidras@desy.de)
+
 """
 import b2plot
 import numpy as np
@@ -69,14 +73,72 @@ def ratio(y1, y2, y1_err=None, y2_err= None):
     return r, re
 
 
-def divhist(h1,h2):
-#     np.mean(hebg[2], axis=0)
+def divideEfficiency(n_nom, n_denom, confidence=0.683):
+    """ divides two histograms for an efficiency calculation
+
+    Args:
+        n_nom: y values of nominator histogram (1d or 2d)
+        n_denom: y values of denominator histogram  (1d or 2d)
+        confidence: (optional) error of first
+
+    Returns:
+        ratio, [upper ratio error, lower ratio error]
+    """
+    shape = np.shape(n_nom)
+
+    flattened_n_nom = n_nom.flatten()
+    flattened_n_denom = n_denom.flatten()
+
+    rat = []
+    err_down = []
+    err_up = []
+
+    for passes, counts in zip(flattened_n_nom, flattened_n_denom):
+        bin_ratio = exact_CI(passes, counts, conf=confidence)
+        rat.append(bin_ratio[0])
+        err_down.append(bin_ratio[1])
+        err_up.append(bin_ratio[2])
+
+    err_down = np.reshape(err_down, shape)
+    err_up = np.reshape(err_up, shape)
+    rat = np.reshape(rat, shape)
+
+    return rat, (err_down, err_up)
+
+
+def exact_CI(k, n, conf=0.683):
+    """ calculated clopper pearson confidence intervals
+
+    Args:
+        k: 
+        n: y 
+        conf: 
+
+    Returns:
+        ratio, [upper ratio error, lower ratio error] 
+    """
+
+    from scipy.stats import beta
+    from scipy.special import betainc
+    k = float(k)
+    n = float(n)
+    p = (k/n) if n>0 else 0
+
+    alpha = (1 - conf)
+    up =  1 - beta.ppf(alpha/2,n-k,k+1)
+    down = 1 - beta.ppf(1-alpha/2,n-k+1,k)
+
+    result = (p, p-down, up-p)
+    return result
+
+
+def divhist(h1, h2):
     assert np.mean(h1[1]-h2[1]) < 0.1
     r,re = ratio(h1[0],h2[0], np.mean(h1[2], axis=0),np.mean(h2[2], axis=0) )
     return r, h1[1], [re,re]
 
 
-def subhist(h1,h2, rethist=False):
+def subhist(h1, h2, rethist=False):
     assert np.mean(h1[1]-h2[1]) < 0.1
     r = h1[0] - h2[0]
     re = np.sqrt(np.mean(h1[2], axis=0)**2 + np.mean(h2[2], axis=0)**2)
