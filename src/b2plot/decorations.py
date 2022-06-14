@@ -47,7 +47,7 @@ def draw_y_label(label='Entries', unit=None, ha='right', brackets=True,ax=None, 
             ax.set_ylabel(label+' /' + br_open + "{0:.3f}".format(width).rstrip('0').rstrip('.') + ' ' + unit + br_close, ha=ha, *args, **kwargs)
 
 
-def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8, alpha_logo=0.95, shift=0.15, bstyle='italic', *args, **kwargs):
+def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8, alpha_logo=0.95, shift=0.15, bstyle='italic', ax=None, *args, **kwargs):
     """
 
     Args:
@@ -67,9 +67,11 @@ def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8
     if t is None:
         import datetime
         t = " %d (internal)" % datetime.date.today().year
-
-    plt.text(px, py, logo, ha='left',
-             transform=plt.gca().transAxes,
+    if ax is None:
+        ax = plt.gca()
+    
+    ax.text(px, py, logo, ha='left',
+             transform=ax.transAxes,
              fontsize=fontsize,
              style=bstyle,
              alpha=alpha_logo,
@@ -78,8 +80,8 @@ def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8
              # fontproperties=font,
              # bbox={'facecolor':'#377eb7', 'alpha':0.1, 'pad':10}
              )
-    plt.text(px + shift, py, t, ha='left',
-             transform=plt.gca().transAxes,
+    ax.text(px + shift, py, t, ha='left',
+             transform=ax.transAxes,
              fontsize=fontsize,
              #          style='italic',
              alpha=alpha,  *args, **kwargs
@@ -88,8 +90,10 @@ def watermark(t=None,logo="Belle II", px=0.033, py=0.915, fontsize=16, alpha=0.8
              )
 
 
-def lumi(l="$5\; \mathrm{pb}^{-1}$", px=0.033, py=0.839,  *args, **kwargs):
-    plt.text(px, py, "$\int\,L\,\mathrm{dt}\;=\;$" + l, transform=plt.gca().transAxes, *args, **kwargs )
+def lumi(l="$5\; \mathrm{pb}^{-1}$", px=0.033, py=0.839, ax=None,  *args, **kwargs):
+    if ax is None:
+        ax = plt.gca()
+    ax.text(px, py, "$\int\,L\,\mathrm{dt}\;=\;$" + l, transform=ax.transAxes, *args, **kwargs )
 
 
 def text(t, px=0.033, py=0.763,  *args, **kwargs):
